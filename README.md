@@ -25,7 +25,7 @@
 В результате обучения стартовой модели 10-ю эпохами получаем обновлённый файл весов best.pt с метриками 
 
 <p>
-<img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/395831f6-e25c-4b24-a96e-7bf8583b8630" width="50%" alt="image">
+<img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/395831f6-e25c-4b24-a96e-7bf8583b8630" width="70%" alt="image">
 </p>
 
   Далее приступаем к дообучению модели. В качестве датасета можно ис-пользовать как предыдущий датасет, так и другой подходящий с такой разметкой. Информация по сведению датасетов к одной аннотации рассказано в следующем пункте.
@@ -33,7 +33,7 @@
 В результате дообучения модели 15-ю эпохами получаем обновленный файл весов best.pt с метриками 
 
 <p>
-<img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/db4d9a7f-99bf-4613-a8b2-146b10f4e5e9" width="50%" alt="image">
+<img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/db4d9a7f-99bf-4613-a8b2-146b10f4e5e9" width="70%" alt="image">
 </p>
 
 ## Детекция
