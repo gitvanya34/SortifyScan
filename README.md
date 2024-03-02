@@ -53,6 +53,13 @@
  <img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/07207efc-aadd-4b39-8fc3-3bb9a274258a" width="30%" alt="image">
 </p> 
 
+## Использования цифровых двойников 
+
+<img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/00165ef3-4b10-4d1b-a54f-82ee3d9aff10" width="30%" alt="image">
+
+
+https://github.com/gitvanya34/SortifyScan/assets/55062517/75bc5bb9-46e1-4030-8f55-1e2560b3b11b
+
 
 ## Планы развития
 
