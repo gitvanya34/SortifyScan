@@ -60,6 +60,16 @@
 
 https://github.com/gitvanya34/SortifyScan/assets/55062517/75bc5bb9-46e1-4030-8f55-1e2560b3b11b
 
+## Определение контуров объекта для вычисления габаритов
+* Сегментация объекта по ббоксу с детекции
+<img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/94915549-f93b-4224-99d6-0d6c147277fb" width="30%" alt="image">
+
+* Кроп целого объекта на отдельный слой
+* повторная сегментация на более мелкие объекты
+<img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/0e4c9ea3-066a-4371-9827-3065f11c8a61" width="30%" alt="image">
+
+* Экспорт контуров мелких объектов 
+<img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/8a448709-79e6-45e0-b54a-b4b94ba3eabb" width="30%" alt="image">
 
 ## Планы развития
 
