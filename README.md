@@ -70,6 +70,7 @@ https://github.com/gitvanya34/SortifyScan/assets/55062517/75bc5bb9-46e1-4030-8f5
 
 * Экспорт контуров мелких объектов 
 <img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/8a448709-79e6-45e0-b54a-b4b94ba3eabb" width="30%" alt="image">
+<img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/55d8a2e4-64c0-4d3c-9214-73b88513f655" width="30%" alt="image">
 
 ## Планы развития
 
