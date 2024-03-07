@@ -1,6 +1,6 @@
 # SortifyScan: Детекция и сегментация товаров на сортировочной ленте
 
-<a href="https://colab.research.google.com/github/gitvanya34/SortifyScan/blob/main/Detection_and_Segmentation_Sortify_Scan.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Py"></a>
+<a href="https://github.com/gitvanya34/SortifyScan/blob/main/Detection_and_Segmentation_Sortify_Scan.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Py"></a>
 ## Описание
 Этот репозиторий посвящен разработке системы детекции и сегментации товаров на сортировочной ленте в контексте складской логистики. Проект направлен на создание инструмента для автоматической обработки видеопотока с камер, установленных на сортировочных лентах, с целью идентификации и сегментации различных товаров.
 
