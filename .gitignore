@@ -1,0 +1,12 @@
+/SortifyScanAPI\venv
+/SortifyScanAPI/.idea
+/SortifyScanAPI/myApi/myApi/__pycache__
+/SortifyScanAPI/myApi/polls/__pycache__
+/SortifyScanAPI/myApi/polls/migrations/__pycache__
+/SortifyScanAPI/venv
+SortifyScanAPI/myApi/db.sqlite3
+.ipynb_checkpoints/Detection_and_Segmentation_Sortify_Scan-checkpoint.ipynb
+VM/ssh.txt
+/VM
+/SortifyScanAPI/cargo/__pycache__
+/SortifyScanAPI/myApi
