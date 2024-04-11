@@ -80,7 +80,8 @@ if __name__ == "__main__":
     sides_dict = cargo.MOCK_SIDES_DICT
     sides_dict = json.loads(sides_dict.replace("\'", "\""))
     print(sides_dict['sides'][0]['edges'][0])
-
+    # TODO:  Распределение в сторон в переменные контруктор
+    print(sides_dict)
     print(search_down_edge(sides_dict))
     box = boxwgh.Boxwgh()
     box.front_side.down_edge = boxwgh.Edge(search_down_edge(sides_dict))
@@ -96,6 +97,8 @@ if __name__ == "__main__":
     print(borders.draw_mesh(borders.parallel_mesh()))
     print(borders)
     print(borders.get_perspective_transform())
+
+
     # borders.get_perspective_transform()
 
 

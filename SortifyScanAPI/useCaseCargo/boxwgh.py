@@ -23,12 +23,13 @@ class Boxwgh:
 'length_z': {self.length_z}
 }}"""
 
+    #TODO: Распределение в сторон в переменные контруктор фронт и верхний
     def __init__(self, json_data=None):
+        self.front_side = Side()
         self.up_side = Side()
         self.down_side = Side()
         self.left_side = Side()
         self.right_side = Side()
-        self.front_side = Side()
         self.back_side = Side()
         self.length_x = None
         self.length_y = None
@@ -77,6 +78,7 @@ class Side:
     'right_edge': {self.right_edge}
 }}"""
 
+    # TODO: Распределение в ребер в переменные контруктор нуден верних нижний и боковой на верхней
     def __init__(self):
         self.up_edge = Edge()
         self.down_edge = Edge()
@@ -188,6 +190,20 @@ class Borders:
         self.scale = 500
         self.proportion_p_left_right = self.left.length_p / self.right.length_p
 
+        image_coords = np.array([[self.up.point_1.x, -self.up.point_1.y],
+                                 [self.up.point_2.x, -self.up.point_2.y],
+                                 [self.down.point_2.x, -self.down.point_2.y],
+                                 [self.down.point_1.x, -self.down.point_1.y]],
+                                dtype=np.float32)  # Координаты на изображении
+        world_coords = np.array([[0, 0],
+                                 [self.up.length_m * self.scale, 0],
+                                 [self.down.length_m * self.scale, self.right.length_m * self.scale],
+                                 [0, self.left.length_m * self.scale]], dtype=np.float32)  # Новые координаты
+        # Вычисление матрицы преобразования перспективы
+        self.perspective_matrix = cv2.getPerspectiveTransform(image_coords, world_coords)
+        # Инвертирование матрицы преобразования
+        self.inverse_perspective_matrix = np.linalg.inv(self.perspective_matrix)
+
     def parallel_mesh(self, min_limit=-1, max_limit=-639, step=-50):
         mesh = []
         for dyl in range(min_limit, max_limit, step):
@@ -221,27 +237,59 @@ class Borders:
         plt.imshow(image)
         plt.show()
 
-    def get_perspective_transform(self, side: Side = None):
+    def get_orto_coords(self, edge: Edge):
+        return cv2.perspectiveTransform(np.array(edge.get_edge(), dtype=np.float32)
+                                               .reshape(-1, 1, 2), self.perspective_matrix)
+    # TODO проверить после контрукторов
+    def get_gabarity(self, box: Boxwgh):
+        front_side = box.front_side
+        up_side = box.front_side
 
+        orto_front_down = self.get_orto_coords(front_side.down_edge)
+        orto_front_up = self.get_orto_coords(front_side.up_edge)
+        orto_front_left = self.get_orto_coords(front_side.left_edge)
+
+        orto_up_down = self.get_orto_coords(up_side.down_edge)
+        orto_up_up = self.get_orto_coords(up_side.up_edge)
+        orto_up_left = self.get_orto_coords(up_side.left_edge)
+
+        front_side.down_edge.length_p = np.linalg.norm(orto_front_down[0] - orto_front_down[1]) / self.scale
+        front_side.down_edge.length_m = front_side.down_edge.length_p
+        box.length_x = front_side.down_edge.length_m
+
+        front_side.up_edge.length_p = np.linalg.norm(orto_front_up[0] - orto_front_up[1]) / self.scale
+        front_side.up_edge.length_m = front_side.down_edge.length_m
+
+        front_side.left_edge.length_p = np.linalg.norm(orto_front_left[0] - orto_front_left[1]) / self.scale
+        front_side.left_edge.length_m = front_side.left_edge.length_p * \
+                                        (front_side.down_edge.length_p / front_side.up_edge.length_p)
+
+        up_side.down_edge.length_p = np.linalg.norm(orto_up_down[0] - orto_up_down[1]) / self.scale
+        up_side.down_edge.length_m = front_side.down_edge.length_m
+
+        up_side.up_edge.length_m = front_side.down_edge.length_m
+
+        up_side.left_edge.length_p = np.linalg.norm(orto_up_left[0] - orto_up_left[1]) / self.scale
+        up_side.up_edge.length_p = np.linalg.norm(orto_up_up[0] - orto_up_up[1]) / self.scale
+        up_side.left_edge.length_m = up_side.left_edge.length_p \
+                                     * (up_side.up_edge.length_p / up_side.down_edge.length_p) \
+                                     * (front_side.down_edge.length_p / front_side.up_edge.length_p)
+
+        box.length_x = front_side.down_edge.length_m
+        box.length_y = front_side.left_edge.length_m
+        box.length_z = up_side.left_edge.length_m
+
+        print(f"Длина (0.569м): {box.length_z}м; delta {(0.569 - box.length_z) * 100}см")
+        print(f"Ширина (0.516м): {box.length_x}м; delta {(0.516 - box.length_x) * 100}см")
+        print(f"Высота (0.381м): {box.length_y}м; delta {(0.381 - box.length_y) * 100}см")
+        return
+
+    def test(self, front_side, up_side):
         # Исходное изображение
         image = cv2.imread(PATH_PRIVATE_IMAGE)
 
-        # Заданные начальные и конечные точки преобразования
-        image_coords = np.array([[self.up.point_1.x, -self.up.point_1.y],
-                                 [self.up.point_2.x, -self.up.point_2.y],
-                                 [self.down.point_2.x, -self.down.point_2.y],
-                                 [self.down.point_1.x, -self.down.point_1.y]],
-                                dtype=np.float32)  # Координаты на изображении
-        world_coords = np.array([[0, 0],
-                                 [self.up.length_m * self.scale, 0],
-                                 [self.down.length_m * self.scale, self.right.length_m * self.scale],
-                                 [0, self.left.length_m * self.scale]], dtype=np.float32)  # Новые координаты
-
-        # Вычисление матрицы преобразования перспективы
-        perspective_matrix = cv2.getPerspectiveTransform(image_coords, world_coords)
-
         # Применение преобразования перспективы к изображению
-        perspective_image = cv2.warpPerspective(image, perspective_matrix,
+        perspective_image = cv2.warpPerspective(image, self.perspective_matrix,
                                                 (int(max(self.up.length_m * self.scale, self.down.length_m)) + 200,
                                                  int(max(self.left.length_m * self.scale, self.right.length_m))))
         plt.imshow(perspective_image)
@@ -256,7 +304,7 @@ class Borders:
 
         # Преобразование координат изображения в координаты реального мира
         world_coords_unknown = cv2.perspectiveTransform(image_coords_unknown.reshape(-1, 1, 2),
-                                                        perspective_matrix)
+                                                        self.perspective_matrix)
 
         print()
         print(world_coords_unknown[0][0])
@@ -295,6 +343,6 @@ class Borders:
         print(up_left / (up_up / front_up) / (front_up / front_down))
 
         length = up_left / (up_up / front_up) / (front_up / front_down)
-        print(f"Длина (0.569м): {length}м; delta {(0.569 - length) *100}см")
-        print(f"Ширина (0.516м): {width}м; delta {(0.516 - width) *100}см")
-        print(f"Высота (0.381м): {height}м; delta {(0.381 - height)*100}см")
+        print(f"Длина (0.569м): {length}м; delta {(0.569 - length) * 100}см")
+        print(f"Ширина (0.516м): {width}м; delta {(0.516 - width) * 100}см")
+        print(f"Высота (0.381м): {height}м; delta {(0.381 - height) * 100}см")
