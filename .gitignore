@@ -13,3 +13,7 @@ VM/ssh.txt
 SortifyScanAPI/privateconstants.py
 /ConveyorEmulator/models
 /SortifyScanAPI/useCaseCargo/__pycache__
+ConveyorEmulator/render/0000-0120.avi
+*.blend1
+*.7z
+ConveyorEmulator/fullilment1.blend

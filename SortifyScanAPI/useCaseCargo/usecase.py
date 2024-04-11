@@ -59,19 +59,14 @@ def search_lowest_centroid_edges(sd):
     return min_centroids
 
 
-def search_lowest_edge(sd):
+def search_down_edge(sd):
     lowest_edges = []
     min_centroids = search_lowest_centroid_edges(sd)
     for i in sd['sides']:
-        c = []
         for j in i['edges']:
             if j['line']['centoroid']['xy'][1] < min_centroids:
                 min_centroids = j['line']['centoroid']['xy'][1]
                 lowest_edges = j
-
-    # coef_position = (lowest_edges['line']['centoroid']['xy'][1] + 640) / 640
-    # # print(coef_position * perspective_coef * p_dist)
-
     return lowest_edges
 
 
@@ -86,38 +81,21 @@ if __name__ == "__main__":
     sides_dict = json.loads(sides_dict.replace("\'", "\""))
     print(sides_dict['sides'][0]['edges'][0])
 
-    print(search_lowest_edge(sides_dict))
+    print(search_down_edge(sides_dict))
     box = boxwgh.Boxwgh()
-    box.front_side.down_edge = boxwgh.Edge(search_lowest_edge(sides_dict))
+    box.front_side.down_edge = boxwgh.Edge(search_down_edge(sides_dict))
     print(box.front_side.down_edge)
 
     proportion_work_area()
+    # print(box.equality_edges())
+    print(box)
+    # print(.get_perspective_transform)
+
     print(cargo.JSON_BORDERS)
     borders = boxwgh.Borders(cargo.JSON_BORDERS)
     print(borders.draw_mesh(borders.parallel_mesh()))
     print(borders)
+    print(borders.get_perspective_transform())
+    # borders.get_perspective_transform()
 
-    import cv2
-    import numpy as np
-    # Исходное изображение
-    image = cv2.imread(PATH_PRIVATE_IMAGE)
-    # Известные мировые координаты прямоугольной области
-    # world_coords = np.array([[0, 1], [1, 1], [0, 0], [1, 0]], dtype=np.float32)
-    #
-    # # Известные проекции мировых координат на изображение
-    # image_coords = np.array([[188, 577], [638, 509], [165, 18], [332, 9]], dtype=np.float32)
 
-    # Заданные начальные и конечные точки преобразования
-    src_points = np.array([[165, 18], [332, 9], [638, 509], [188, 577]], dtype=np.float32)  # Координаты на изображении
-    dst_points = np.array([[0, 0], [160, 0], [160, 600], [0, 600]], dtype=np.float32)  # Новые координаты
-
-    # Вычисление матрицы преобразования перспективы
-    perspective_matrix = cv2.getPerspectiveTransform(src_points, dst_points)
-
-    # Применение преобразования перспективы к изображению
-    perspective_image = cv2.warpPerspective(image, perspective_matrix, (640, 640))
-
-    # Отображение ортогонального изображения
-    cv2.imshow('Orthogonal Image', perspective_image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()

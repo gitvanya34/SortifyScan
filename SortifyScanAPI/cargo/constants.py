@@ -19,9 +19,9 @@ ARR_LENT_UP = np.array([[165, 18], [332, 9]])
 ARR_LENT_DOWN = np.array([[188, 577], [638, 509]])
 
 JSON_BORDERS = {'left': {'line': {'xy': ARR_LENT_LEFT, 'length': LENT_REAL_LEFT}},
-                 'right': {'line': {'xy': ARR_LENT_RIGHT, 'length': LENT_REAL_LEFT}},
-                 'up': {'line': {'xy': ARR_LENT_UP, 'length': LENT_REAL_LEFT}},
-                 'down': {'line': {'xy': ARR_LENT_DOWN, 'length': LENT_REAL_LEFT}},
+                 'right': {'line': {'xy': ARR_LENT_RIGHT, 'length': LENT_REAL_RIGHT}},
+                 'up': {'line': {'xy': ARR_LENT_UP, 'length': LENT_REAL_UP}},
+                 'down': {'line': {'xy': ARR_LENT_DOWN, 'length': LENT_REAL_DOWN}},
                  }
 
 
