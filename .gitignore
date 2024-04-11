@@ -10,3 +10,6 @@ VM/ssh.txt
 /VM
 /SortifyScanAPI/cargo/__pycache__
 /SortifyScanAPI/myApi
+SortifyScanAPI/privateconstants.py
+/ConveyorEmulator/models
+/SortifyScanAPI/useCaseCargo/__pycache__
