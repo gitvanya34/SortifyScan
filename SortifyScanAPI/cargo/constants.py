@@ -5,17 +5,24 @@ PATH_WEIGHTS_YOLO = '/content/drive/MyDrive/yolov8l.pt 2.0 /runs4 best 0.751 /de
 PATH_WEIGHTS_SAM = '/content/drive/MyDrive/SAM/sam_b.pt'
 
 # Размеры ленты калиборованные реальные в метрах
-LENT_REAL_LEFT = 3.44579
-LENT_REAL_RIGHT = 3.19624
-LENT_REAL_UP = 0.803967
-LENT_REAL_DOWN = 0.800971
-LENT_REAL_WIGHT = 0.8007
+LENT_REAL_LEFT = 3.02624
+LENT_REAL_RIGHT = 3.02624
+LENT_REAL_UP = 0.786
+LENT_REAL_DOWN = 0.786
+LENT_REAL_WIGHT = 0.786
 LENT_REAL_CAMERA_LEN = 1.10854
+
 # Откалиброванные границы ленты пиксели ленты, легко калибруются с клиента
-ARR_LENT_LEFT = np.array([[164, 0], [190, 640]])
-ARR_LENT_RIGHT = np.array([[640, 509], [327, 0]])
-ARR_LENT_UP = np.array([[164, 0], [327, 0]])
-ARR_LENT_DOWN = np.array([[640, 509], [190, 640]])
+ARR_LENT_LEFT = np.array([[165, 18], [188, 577]])
+ARR_LENT_RIGHT = np.array([[332, 9], [638, 509]])
+ARR_LENT_UP = np.array([[165, 18], [332, 9]])
+ARR_LENT_DOWN = np.array([[188, 577], [638, 509]])
+
+JSON_BORDERS = {'left': {'line': {'xy': ARR_LENT_LEFT, 'length': LENT_REAL_LEFT}},
+                 'right': {'line': {'xy': ARR_LENT_RIGHT, 'length': LENT_REAL_LEFT}},
+                 'up': {'line': {'xy': ARR_LENT_UP, 'length': LENT_REAL_LEFT}},
+                 'down': {'line': {'xy': ARR_LENT_DOWN, 'length': LENT_REAL_LEFT}},
+                 }
 
 
 MOCK_SIDES_DICT = """{'sides': [{'edges': [{'line': {'xy': [[411.40599614753864,
