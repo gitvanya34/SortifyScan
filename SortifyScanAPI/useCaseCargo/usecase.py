@@ -45,29 +45,29 @@ def distance(xs, ys):
     return np.sqrt((xs[0] - xs[1]) ** 2 + (ys[0] - ys[1]) ** 2)
 
 
-def search_lowest_centroid_edges(sd):
-    centroids = []
-
-    for i in sd['sides']:
-        c = []
-        for j in i['edges']:
-            c.append(j['line']['centoroid']['xy'])
-        centroids.append(c)
-    print(centroids)
-    min_centroids = sd['sides'][0]['edges'][0]['line']['centoroid']['xy'][1]
-
-    return min_centroids
-
-
-def search_down_edge(sd):
-    lowest_edges = []
-    min_centroids = search_lowest_centroid_edges(sd)
-    for i in sd['sides']:
-        for j in i['edges']:
-            if j['line']['centoroid']['xy'][1] < min_centroids:
-                min_centroids = j['line']['centoroid']['xy'][1]
-                lowest_edges = j
-    return lowest_edges
+# def search_lowest_centroid_edges(sd):
+#     centroids = []
+#
+#     for i in sd['sides']:
+#         c = []
+#         for j in i['edges']:
+#             c.append(j['line']['centoroid']['xy'])
+#         centroids.append(c)
+#     print(centroids)
+#     min_centroids = sd['sides'][0]['edges'][0]['line']['centoroid']['xy'][1]
+#
+#     return min_centroids
+#
+#
+# def search_down_edge(sd):
+#     lowest_edges = []
+#     min_centroids = search_lowest_centroid_edges(sd)
+#     for i in sd['sides']:
+#         for j in i['edges']:
+#             if j['line']['centoroid']['xy'][1] < min_centroids:
+#                 min_centroids = j['line']['centoroid']['xy'][1]
+#                 lowest_edges = j
+#     return lowest_edges
 
 
 def proportion_work_area():
@@ -79,26 +79,27 @@ def proportion_work_area():
 if __name__ == "__main__":
     sides_dict = cargo.MOCK_SIDES_DICT
     sides_dict = json.loads(sides_dict.replace("\'", "\""))
-    print(sides_dict['sides'][0]['edges'][0])
+    # print(sides_dict['sides'][0]['edges'][0])
     # TODO:  Распределение в сторон в переменные контруктор
-    print(sides_dict)
-    print(search_down_edge(sides_dict))
-    box = boxwgh.Boxwgh()
-    box.front_side.down_edge = boxwgh.Edge(search_down_edge(sides_dict))
-    print(box.front_side.down_edge)
-
-    proportion_work_area()
-    # print(box.equality_edges())
+    # print(sides_dict)
+    # print(search_down_edge(sides_dict))
+    box = boxwgh.Boxwgh(sides_dict)
     print(box)
-    # print(.get_perspective_transform)
-
-    print(cargo.JSON_BORDERS)
+    # box.front_side.down_edge = boxwgh.Edge(search_down_edge(sides_dict))
+    # print(box.front_side.down_edge)
+    #
+    proportion_work_area()
+    # # print(box.equality_edges())
+    # print(box)
+    # # print(.get_perspective_transform)
+    #
+    # print(cargo.JSON_BORDERS)
     borders = boxwgh.Borders(cargo.JSON_BORDERS)
     print(borders.draw_mesh(borders.parallel_mesh()))
-    print(borders)
-    print(borders.get_perspective_transform())
 
+    print(borders.test("bo", " "))
+    # print(box)
 
     # borders.get_perspective_transform()
-
+#
 

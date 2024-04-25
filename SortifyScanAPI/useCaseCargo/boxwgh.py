@@ -23,7 +23,7 @@ class Boxwgh:
 'length_z': {self.length_z}
 }}"""
 
-    #TODO: Распределение в сторон в переменные контруктор фронт и верхний
+    # TODO: Распределение в сторон в переменные контруктор фронт и верхний
     def __init__(self, json_data=None):
         self.front_side = Side()
         self.up_side = Side()
@@ -35,13 +35,70 @@ class Boxwgh:
         self.length_y = None
         self.length_z = None
 
-    # def equality_edges(self):
-    #     if self.front_side.down_edge.is_xy:
-    #
-    #     print(self.front_side.down_edge.is_xy)
-    #     print(self.front_side.up_edge.is_xy)
+        if json_data is not None:
+            front_side_down_edge, front_side_up_edge, front_side_left_edge, front_side_right_edge \
+                = Boxwgh.search_front_side(json_data)
+            self.front_side.down_edge = Edge(front_side_down_edge)
+            self.front_side.up_edge = Edge(front_side_up_edge)
+            self.front_side.left_edge = Edge(front_side_left_edge)
+            self.front_side.right_edge = Edge(front_side_right_edge)
+
+            up_side_down_edge, up_side_up_edge, up_side_left_edge, up_side_right_edge \
+                = Boxwgh.search_up_side(json_data)
+            self.up_side.down_edge = Edge(up_side_down_edge)
+            self.up_side.up_edge = Edge(up_side_up_edge)
+            self.up_side.left_edge = Edge(up_side_left_edge)
+            self.up_side.right_edge = Edge(up_side_right_edge)
+
+    @staticmethod
+    def search_front_side(sd):
+        lowest_centroids = sd['sides'][0]['edges'][0]['line']['centoroid']['xy'][1]
+        lowest_side = sd['sides'][0]['edges']
+        for side in sd['sides']:
+            for edge in side['edges']:
+                if lowest_centroids < edge['line']['centoroid']['xy'][1]:
+                    lowest_centroids = edge['line']['centoroid']['xy'][1]
+                    lowest_side = side['edges']
+
+        down_edge, up_edge, left_edge, right_edge = Boxwgh.distribution_edge(lowest_side)
+        return down_edge, up_edge, left_edge, right_edge
+
+    @staticmethod
+    def search_up_side(sd):
+        uppers_centroids = sd['sides'][0]['edges'][0]['line']['centoroid']['xy'][1]
+        upper_side = sd['sides'][0]['edges']
+        for side in sd['sides']:
+            for edge in side['edges']:
+                if uppers_centroids > edge['line']['centoroid']['xy'][1]:
+                    uppers_centroids = edge['line']['centoroid']['xy'][1]
+                    upper_side = side['edges']
+
+        down_edge, up_edge, left_edge, right_edge = Boxwgh.distribution_edge(upper_side)
+        return down_edge, up_edge, left_edge, right_edge
+
+    @staticmethod
+    def distribution_edge(edges):
+        down = up = edges[0]['line']['centoroid']['xy'][1]
+        left = right = edges[0]['line']['centoroid']['xy'][0]
+        down_edge = up_edge = left_edge = right_edge = edges[0]
+        for edge in edges:
+            if down < edge['line']['centoroid']['xy'][1]:
+                down = edge['line']['centoroid']['xy'][1]
+                down_edge = edge
+            if up > edge['line']['centoroid']['xy'][1]:
+                up = edge['line']['centoroid']['xy'][1]
+                up_edge = edge
+            if left > edge['line']['centoroid']['xy'][0]:
+                left = edge['line']['centoroid']['xy'][0]
+                left_edge = edge
+            if right < edge['line']['centoroid']['xy'][0]:
+                right = edge['line']['centoroid']['xy'][0]
+                right_edge = edge
+
+        return down_edge, up_edge, left_edge, right_edge
 
     def equality_edges_length(self):
+
         first_dimension = [self.front_side.down_edge, self.front_side.up_edge,
                            self.back_side.down_edge, self.back_side.up_edge,
                            self.down_side.up_edge, self.down_side.down_edge,
@@ -62,7 +119,6 @@ class Boxwgh:
 
         for dimension in [first_dimension, second_dimension, third_dimension]:
             for edge in dimension:
-                print(edge)
                 if edge.length_m is not None:
                     for e in third_dimension:
                         e.length_m = edge.length_m
@@ -79,7 +135,7 @@ class Side:
 }}"""
 
     # TODO: Распределение в ребер в переменные контруктор нуден верних нижний и боковой на верхней
-    def __init__(self):
+    def __init__(self, json_data: dict = None):
         self.up_edge = Edge()
         self.down_edge = Edge()
         self.left_edge = Edge()
@@ -151,7 +207,7 @@ class Edge:
         if self.is_xy:
             p1 = self.point_1.get_xy()
             p2 = self.point_2.get_xy()
-            print(p1, p2)
+            # print(p1, p2)
             return self.distance(p1[0], p1[1], p2[0], p2[1])
         return None
 
@@ -159,7 +215,7 @@ class Edge:
     def linear_equation(x1, y1, x2, y2):
         a = (y2 - y1) / (x2 - x1)
         b = y1 - a * x1
-        print(f"Уравнение прямой: y = {a}x + {b}")
+        # print(f"Уравнение прямой: y = {a}x + {b}")
         return a, b
 
     @staticmethod
@@ -180,8 +236,8 @@ class Borders:
 
     def __init__(self, d):
         for k in d:
-            d[k]['line']['xy'][0][1] = -d[k]['line']['xy'][0][1]
-            d[k]['line']['xy'][1][1] = -d[k]['line']['xy'][1][1]
+            d[k]['line']['xy'][0][1] = d[k]['line']['xy'][0][1]
+            d[k]['line']['xy'][1][1] = d[k]['line']['xy'][1][1]
 
         self.up = Edge(d['up'])
         self.down = Edge(d['down'])
@@ -190,10 +246,10 @@ class Borders:
         self.scale = 500
         self.proportion_p_left_right = self.left.length_p / self.right.length_p
 
-        image_coords = np.array([[self.up.point_1.x, -self.up.point_1.y],
-                                 [self.up.point_2.x, -self.up.point_2.y],
-                                 [self.down.point_2.x, -self.down.point_2.y],
-                                 [self.down.point_1.x, -self.down.point_1.y]],
+        image_coords = np.array([[self.up.point_1.x, self.up.point_1.y],
+                                 [self.up.point_2.x, self.up.point_2.y],
+                                 [self.down.point_2.x, self.down.point_2.y],
+                                 [self.down.point_1.x, self.down.point_1.y]],
                                 dtype=np.float32)  # Координаты на изображении
         world_coords = np.array([[0, 0],
                                  [self.up.length_m * self.scale, 0],
@@ -239,55 +295,71 @@ class Borders:
 
     def get_orto_coords(self, edge: Edge):
         return cv2.perspectiveTransform(np.array(edge.get_edge(), dtype=np.float32)
-                                               .reshape(-1, 1, 2), self.perspective_matrix)
+                                        .reshape(-1, 1, 2), self.perspective_matrix)
+
     # TODO проверить после контрукторов
     def get_gabarity(self, box: Boxwgh):
-        front_side = box.front_side
-        up_side = box.front_side
+        def distance(x1, y1, x2, y2):
+            return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
-        orto_front_down = self.get_orto_coords(front_side.down_edge)
-        orto_front_up = self.get_orto_coords(front_side.up_edge)
-        orto_front_left = self.get_orto_coords(front_side.left_edge)
+        orto_front_down = self.get_orto_coords(box.front_side.down_edge)
+        orto_front_up = self.get_orto_coords(box.front_side.up_edge)
+        orto_front_left = self.get_orto_coords(box.front_side.left_edge)
 
-        orto_up_down = self.get_orto_coords(up_side.down_edge)
-        orto_up_up = self.get_orto_coords(up_side.up_edge)
-        orto_up_left = self.get_orto_coords(up_side.left_edge)
+        orto_up_down = self.get_orto_coords(box.up_side.down_edge)
+        orto_up_up = self.get_orto_coords(box.up_side.up_edge)
+        orto_up_left = self.get_orto_coords(box.up_side.left_edge)
 
-        front_side.down_edge.length_p = np.linalg.norm(orto_front_down[0] - orto_front_down[1]) / self.scale
-        front_side.down_edge.length_m = front_side.down_edge.length_p
-        box.length_x = front_side.down_edge.length_m
+        box.front_side.down_edge.length_p = np.linalg.norm(orto_front_down[0] - orto_front_down[1]) / self.scale
+        box.front_side.down_edge.length_m = box.front_side.down_edge.length_p
+        box.length_x = box.front_side.down_edge.length_m
 
-        front_side.up_edge.length_p = np.linalg.norm(orto_front_up[0] - orto_front_up[1]) / self.scale
-        front_side.up_edge.length_m = front_side.down_edge.length_m
+        box.front_side.up_edge.length_p = np.linalg.norm(orto_front_up[0] - orto_front_up[1]) / self.scale
+        box.front_side.up_edge.length_m = box.front_side.down_edge.length_m
 
-        front_side.left_edge.length_p = np.linalg.norm(orto_front_left[0] - orto_front_left[1]) / self.scale
-        front_side.left_edge.length_m = front_side.left_edge.length_p * \
-                                        (front_side.down_edge.length_p / front_side.up_edge.length_p)
+        box.front_side.left_edge.length_p = np.linalg.norm(orto_front_left[0] - orto_front_left[1]) / self.scale
+        box.front_side.left_edge.length_m = box.front_side.left_edge.length_p * \
+                                            (box.front_side.down_edge.length_p / box.front_side.up_edge.length_p)
 
-        up_side.down_edge.length_p = np.linalg.norm(orto_up_down[0] - orto_up_down[1]) / self.scale
-        up_side.down_edge.length_m = front_side.down_edge.length_m
+        box.up_side.down_edge.length_p = np.linalg.norm(orto_up_down[0] - orto_up_down[1]) / self.scale
+        box.up_side.down_edge.length_m = box.front_side.down_edge.length_m
 
-        up_side.up_edge.length_m = front_side.down_edge.length_m
+        box.up_side.up_edge.length_m = box.front_side.down_edge.length_m
 
-        up_side.left_edge.length_p = np.linalg.norm(orto_up_left[0] - orto_up_left[1]) / self.scale
-        up_side.up_edge.length_p = np.linalg.norm(orto_up_up[0] - orto_up_up[1]) / self.scale
-        up_side.left_edge.length_m = up_side.left_edge.length_p \
-                                     * (up_side.up_edge.length_p / up_side.down_edge.length_p) \
-                                     * (front_side.down_edge.length_p / front_side.up_edge.length_p)
+        box.up_side.left_edge.length_p = np.linalg.norm(orto_up_left[0] - orto_up_left[1]) / self.scale
+        box.up_side.up_edge.length_p = np.linalg.norm(orto_up_up[0] - orto_up_up[1]) / self.scale
+        box.up_side.left_edge.length_m = box.up_side.left_edge.length_p \
+                                         \
+                                         * (box.front_side.down_edge.length_p / box.front_side.up_edge.length_p)
 
-        box.length_x = front_side.down_edge.length_m
-        box.length_y = front_side.left_edge.length_m
-        box.length_z = up_side.left_edge.length_m
+        box.length_x = box.front_side.down_edge.length_m
+        box.length_y = box.front_side.left_edge.length_m
+        box.length_z = box.up_side.left_edge.length_m
 
-        print(f"Длина (0.569м): {box.length_z}м; delta {(0.569 - box.length_z) * 100}см")
-        print(f"Ширина (0.516м): {box.length_x}м; delta {(0.516 - box.length_x) * 100}см")
-        print(f"Высота (0.381м): {box.length_y}м; delta {(0.381 - box.length_y) * 100}см")
+        width = 0.516
+        lenght = 0.569
+        height = 0.381
+        print(
+            f"Длина (0.569м): {box.length_z}м; delta {(lenght - box.length_z) * 100}см, %{(lenght - box.length_z)*100 / box.length_z}")
+        print(
+            f"Ширина (0.516м): {box.length_x}м; delta {(width - box.length_x) * 100}см, %{(width - box.length_x)*100 / box.length_x}")
+        print(
+            f"Высота (0.381м): {box.length_y}м; delta {(height - box.length_y) * 100}см, %{(height - box.length_y)*100 / box.length_y}")
+
         return
+
+    def draw_image_orto(self, path=PATH_PRIVATE_IMAGE):
+        image = cv2.imread(path)
+        # Применение преобразования перспективы к изображению
+        perspective_image = cv2.warpPerspective(image, self.perspective_matrix,
+                                                (int(max(self.up.length_m * self.scale, self.down.length_m)) + 200,
+                                                 int(max(self.left.length_m * self.scale, self.right.length_m))))
+        plt.imshow(perspective_image)
+        plt.show()
 
     def test(self, front_side, up_side):
         # Исходное изображение
         image = cv2.imread(PATH_PRIVATE_IMAGE)
-
         # Применение преобразования перспективы к изображению
         perspective_image = cv2.warpPerspective(image, self.perspective_matrix,
                                                 (int(max(self.up.length_m * self.scale, self.down.length_m)) + 200,
@@ -331,18 +403,12 @@ class Borders:
         front_left = np.linalg.norm(world_coords_unknown[0] - world_coords_unknown[3]) / self.scale
         front_up = np.linalg.norm(world_coords_unknown[3] - world_coords_unknown[4]) / self.scale
         up_up = np.linalg.norm(world_coords_unknown[5] - world_coords_unknown[6]) / self.scale
-
         up_left = np.linalg.norm(world_coords_unknown[3] - world_coords_unknown[5]) / self.scale
 
-        print(front_left / (front_up / front_down))
         height = front_left / (front_up / front_down)
         width = front_down
-        print(front_left)
-        print(front_up)
-        print(up_up)
-        print(up_left / (up_up / front_up) / (front_up / front_down))
-
         length = up_left / (up_up / front_up) / (front_up / front_down)
+
         print(f"Длина (0.569м): {length}м; delta {(0.569 - length) * 100}см")
         print(f"Ширина (0.516м): {width}м; delta {(0.516 - width) * 100}см")
         print(f"Высота (0.381м): {height}м; delta {(0.381 - height) * 100}см")
