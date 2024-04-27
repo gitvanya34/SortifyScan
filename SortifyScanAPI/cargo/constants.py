@@ -1,8 +1,12 @@
 import numpy as np
 
-PATH_BEGIN_IMAGE = "/content/drive/MyDrive/images/render1.png"
-PATH_WEIGHTS_YOLO = '/content/drive/MyDrive/yolov8l.pt 2.0 /runs4 best 0.751 /detect/train4/weights/best.pt'
-PATH_WEIGHTS_SAM = '/content/drive/MyDrive/SAM/sam_b.pt'
+import privateconstants
+PATH_BEGIN_IMAGE = privateconstants.PATH_PRIVATE_BEGIN_IMAGE
+PATH_WEIGHTS_YOLO = privateconstants.PATH_PRIVATE_WEIGHTS_YOLO
+PATH_WEIGHTS_SAM = privateconstants.PATH_PRIVATE_WEIGHTS_SAM
+# PATH_BEGIN_IMAGE = "/content/drive/MyDrive/images/render1.png"
+# PATH_WEIGHTS_YOLO = '/content/drive/MyDrive/yolov8l.pt 2.0 /runs4 best 0.751 /detect/train4/weights/best.pt'
+# PATH_WEIGHTS_SAM = '/content/drive/MyDrive/SAM/sam_b.pt'
 
 # Размеры ленты калиборованные реальные в метрах
 LENT_REAL_LEFT = 2.71

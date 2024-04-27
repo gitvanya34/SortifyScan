@@ -52,8 +52,8 @@ class CargoDetection:
         result = predictor()
         return result
 
-    def segmentation_of_the_side(self, result, crop: bool = False, bgcolor: str = "white"):
-        img = CargoProcessing.preparing_for_detailed_segmentation(result, crop, bgcolor)
+    def segmentation_of_the_side(self, result_seg,result_det, crop: bool = False, bgcolor: str = "white"):
+        img = CargoProcessing.preparing_for_detailed_segmentation(result_seg,result_det, crop, bgcolor)
         CargoProcessing.show_image(img)
         result = self.segment_cargo(img)
         return result

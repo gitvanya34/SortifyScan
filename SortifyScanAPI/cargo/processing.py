@@ -4,6 +4,7 @@ from PIL import Image
 from pathlib import Path
 import cv2
 import json
+import platform
 
 
 class CargoProcessing:
@@ -22,8 +23,11 @@ class CargoProcessing:
         result: list
         результат после применения модели
         """
-        image = Image.open(result[0].save_dir + '/' + \
-                           result[0].path.split('/')[-1])
+
+        slash = {'Windows': '\\', 'Linux': '/'}
+        image = Image.open(result[0].save_dir + slash[platform.system()] + \
+                           result[0].path.split(slash[platform.system()])[-1])
+
         plt.imshow(image)
         plt.show()
 
@@ -36,9 +40,10 @@ class CargoProcessing:
           результат после применения модели
           ----------
           """
+        print(result)
         for r in result:
             print(r.tojson())
-        return json.loads(json.dumps(r.tojson()))
+        return json.loads(json.dumps(result[0].tojson()))
 
     @staticmethod
     def get_bbox_from_result(json_data):
@@ -48,12 +53,12 @@ class CargoProcessing:
         return list(box.values())
 
     @staticmethod
-    def preparing_for_detailed_segmentation(result, crop: bool = False, bgcolor: str = "white"):
+    def preparing_for_detailed_segmentation(result_seg, result_det, crop: bool = False, bgcolor: str = "white"):
         """Подготовка для сегментации боковых граней(уменьшение размерности, удаление лишних элементов)
         Возвращает изображение в формате np
         Параметр:
         """
-        for r in result:
+        for r in result_seg:
             img = np.copy(r.orig_img)
             img_name = Path(r.path).stem
 
@@ -78,7 +83,7 @@ class CargoProcessing:
                 # OPTION-3: прозрачный фон на стадии распознования убирает альфа канал и изображение остается неизменным
                 # isolated = np.dstack([img, b_mask])
 
-                bbox = CargoProcessing.get_bbox_from_result(CargoProcessing.result_to_json(result))
+                bbox = CargoProcessing.get_bbox_from_result(CargoProcessing.result_to_json(result_det))
                 bbx1, bby1, bbx2, bby2 = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
                 iso_crop = isolated[bby1:bby2, bbx1:bbx2]
                 _ = cv2.imwrite(f'segcrop{ci}.png', isolated)
