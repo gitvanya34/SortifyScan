@@ -12,16 +12,18 @@ def clean_memory_for_gpu():
 
 
 def case1():
-    result = CargoDetection.detect_cargo()
+    detection = CargoDetection(PATH_WEIGHTS_YOLO, PATH_WEIGHTS_SAM, PATH_BEGIN_IMAGE)
+
+    result = detection.detect_cargo()
     CargoProcessing.show_image_after_ultralytics(result)
 
     clean_memory_for_gpu()
 
     bbox = CargoProcessing.get_bbox_from_result(CargoProcessing.result_to_json(result))
-    result = CargoDetection.segment_cargo_bboxes(result[0].orig_img, bbox)
+    result = detection.segment_cargo_bboxes(result[0].orig_img, bbox)
     CargoProcessing.show_image_after_ultralytics(result)
 
-    result_side = CargoDetection.segmentation_of_the_side(result, crop=True, bgcolor='black')
+    result_side = detection.segmentation_of_the_side(result, crop=True, bgcolor='black')
     CargoProcessing.show_image_after_ultralytics(result_side)
 
     point_cloud = CargoAnalysis.get_xy_edges(result_side,
@@ -47,71 +49,20 @@ def case1():
     # добавляем на будущее словарь центрроидов грани
     return sides_dict
 
-
-import numpy as np
-
-def distance(xs, ys):
-    return np.sqrt((xs[0] - xs[1]) ** 2 + (ys[0] - ys[1]) ** 2)
-
-
-# def search_lowest_centroid_edges(sd):
-#     centroids = []
-#
-#     for i in sd['sides']:
-#         c = []
-#         for j in i['edges']:
-#             c.append(j['line']['centoroid']['xy'])
-#         centroids.append(c)
-#     print(centroids)
-#     min_centroids = sd['sides'][0]['edges'][0]['line']['centoroid']['xy'][1]
-#
-#     return min_centroids
-#
-#
-# def search_down_edge(sd):
-#     lowest_edges = []
-#     min_centroids = search_lowest_centroid_edges(sd)
-#     for i in sd['sides']:
-#         for j in i['edges']:
-#             if j['line']['centoroid']['xy'][1] < min_centroids:
-#                 min_centroids = j['line']['centoroid']['xy'][1]
-#                 lowest_edges = j
-#     return lowest_edges
-
-
-def proportion_work_area():
-    left_border_dist = distance(ARR_LENT_LEFT[0], ARR_LENT_LEFT[1])
-    right_border_dist = distance(ARR_LENT_RIGHT[0], ARR_LENT_RIGHT[1])
-    print(left_border_dist, right_border_dist, left_border_dist / right_border_dist)
-
-
 if __name__ == "__main__":
     sides_dict = MOCK_SIDES_DICT
     sides_dict = json.loads(sides_dict.replace("\'", "\""))
-    # print(sides_dict['sides'][0]['edges'][0])
-    # TODO:  Распределение в сторон в переменные контруктор
-    # print(sides_dict)
-    # print(search_down_edge(sides_dict))
+
     box = boxwgh.Boxwgh(sides_dict)
     print(box)
-    # box.front_side.down_edge = boxwgh.Edge(search_down_edge(sides_dict))
-    # print(box.front_side.down_edge)
-    #
-    proportion_work_area()
-    # # print(box.equality_edges())
-    # print(box)
-    # # print(.get_perspective_transform)
-    #
-    # print(cargo.JSON_BORDERS)
-    borders = boxwgh.Borders(JSON_BORDERS)
-    print(borders.draw_mesh(borders.parallel_mesh()))
 
-    print(borders.test("bo", " "))
+    borders = boxwgh.Borders(JSON_BORDERS)
+    # print(borders.draw_mesh(borders.parallel_mesh()))
+
+    # print(borders.test("bo", " "))
     print(borders.get_gabarity(box))
     borders.draw_gabarity(box)
-    # print(box)
 
-    # borders.get_perspective_transform()
 # Длина (0.569м): 0.5537314142752592м; delta 1.5268585724740769см
 # Ширина (0.516м): 0.5097783508300782м; delta 0.622164916992185см
 # Высота (0.381м): 0.4294147491048885м; delta -4.841474910488852см
