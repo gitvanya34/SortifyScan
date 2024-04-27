@@ -269,7 +269,7 @@ class Borders:
             mesh.append([[dxl, -dyl], [dxr, -dyr]])
         return mesh
 
-    def draw_mesh(self, mesh):
+    def draw_mesh(self, mesh, path=PATH_PRIVATE_IMAGE):
         borders_line = [self.up.get_edge(),
                         self.down.get_edge(),
                         self.left.get_edge(),
@@ -289,13 +289,33 @@ class Borders:
             y_values = [m[0][1], m[1][1]]
             plt.plot(x_values, y_values, color='blue', linewidth=0.5, linestyle='-')
 
-        image = Image.open(PATH_PRIVATE_IMAGE)
+        image = Image.open(path)
         plt.imshow(image)
         plt.show()
 
     def get_orto_coords(self, edge: Edge):
         return cv2.perspectiveTransform(np.array(edge.get_edge(), dtype=np.float32)
                                         .reshape(-1, 1, 2), self.perspective_matrix)
+
+    def draw_gabarity(self, box: Boxwgh, path=PATH_PRIVATE_IMAGE):
+        def draw(edge, lenght):
+            print(edge[0])
+            x = [edge[0][0], edge[1][0]]
+            y = [edge[0][1], edge[1][1]]
+            plt.plot(x, y, linewidth=3, linestyle='-')
+            middle_x = (x[0] + x[-1]) / 2
+            middle_y = (y[0] + y[-1]) / 2
+            # plt.text(middle_x, middle_y, round(lenght, 3), color='black', fontsize=20, ha='center', va='center')
+            # plt.text(middle_x, middle_y, round(lenght, 3), color='purple', fontsize=20, ha='center', va='center')
+            plt.text(middle_x, middle_y, f"{round(lenght, 3)}м", fontsize=13, color='black', ha='center', va='center',
+                     bbox=dict(facecolor='red', alpha=0.5))
+
+        edges = [box.front_side.down_edge, box.front_side.left_edge, box.up_side.left_edge]
+        for edge in edges:
+            draw(edge.get_edge(), edge.length_m)
+        image = Image.open(path)
+        plt.imshow(image)
+        plt.show()
 
     # TODO проверить после контрукторов
     def get_gabarity(self, box: Boxwgh):
@@ -329,7 +349,7 @@ class Borders:
         box.up_side.left_edge.length_p = np.linalg.norm(orto_up_left[0] - orto_up_left[1]) / self.scale
         box.up_side.up_edge.length_p = np.linalg.norm(orto_up_up[0] - orto_up_up[1]) / self.scale
         box.up_side.left_edge.length_m = box.up_side.left_edge.length_p \
-                                         \
+ \
                                          * (box.front_side.down_edge.length_p / box.front_side.up_edge.length_p)
 
         box.length_x = box.front_side.down_edge.length_m
@@ -340,11 +360,11 @@ class Borders:
         lenght = 0.569
         height = 0.381
         print(
-            f"Длина (0.569м): {box.length_z}м; delta {(lenght - box.length_z) * 100}см, %{(lenght - box.length_z)*100 / box.length_z}")
+            f"Длина (0.569м): {box.length_z}м; delta {(lenght - box.length_z) * 100}см, %{(lenght - box.length_z) * 100 / box.length_z}")
         print(
-            f"Ширина (0.516м): {box.length_x}м; delta {(width - box.length_x) * 100}см, %{(width - box.length_x)*100 / box.length_x}")
+            f"Ширина (0.516м): {box.length_x}м; delta {(width - box.length_x) * 100}см, %{(width - box.length_x) * 100 / box.length_x}")
         print(
-            f"Высота (0.381м): {box.length_y}м; delta {(height - box.length_y) * 100}см, %{(height - box.length_y)*100 / box.length_y}")
+            f"Высота (0.381м): {box.length_y}м; delta {(height - box.length_y) * 100}см, %{(height - box.length_y) * 100 / box.length_y}")
 
         return
 
@@ -357,9 +377,9 @@ class Borders:
         plt.imshow(perspective_image)
         plt.show()
 
-    def test(self, front_side, up_side):
+    def test(self, front_side, up_side, path = PATH_PRIVATE_IMAGE):
         # Исходное изображение
-        image = cv2.imread(PATH_PRIVATE_IMAGE)
+        image = cv2.imread(path)
         # Применение преобразования перспективы к изображению
         perspective_image = cv2.warpPerspective(image, self.perspective_matrix,
                                                 (int(max(self.up.length_m * self.scale, self.down.length_m)) + 200,
