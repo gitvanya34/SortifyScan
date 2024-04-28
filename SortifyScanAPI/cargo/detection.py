@@ -23,7 +23,10 @@ class CargoDetection:
           conf: float = 0.75
           """
         model = YOLO(self.path_weights_yolo)
-        result = model.predict(source=self.path_begin_image, save=True, conf=conf)
+        result = model.predict(source=self.path_begin_image,
+                               stream = True,
+                               save=True,
+                               conf=conf)
         return result
 
     # TODO: доделать параметры вынести модель в константу
