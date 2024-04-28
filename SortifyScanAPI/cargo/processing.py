@@ -86,8 +86,8 @@ class CargoProcessing:
                 bbox = CargoProcessing.get_bbox_from_result(CargoProcessing.result_to_json(result_det))
                 bbx1, bby1, bbx2, bby2 = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
                 iso_crop = isolated[bby1:bby2, bbx1:bbx2]
-                _ = cv2.imwrite(f'segcrop{ci}.png', isolated)
-                print(f'segcrop{ci}.png сохранено на диск')
+                # _ = cv2.imwrite(f'segcrop{ci}.png', isolated)
+                # print(f'segcrop{ci}.png сохранено на диск')
 
                 if (crop):
                     return iso_crop
