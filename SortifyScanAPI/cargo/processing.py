@@ -40,7 +40,7 @@ class CargoProcessing:
           результат после применения модели
           ----------
           """
-        print(result)
+        # print(result)
         for r in result:
             print(r.tojson())
         return json.loads(json.dumps(result[0].tojson()))
@@ -49,7 +49,7 @@ class CargoProcessing:
     def get_bbox_from_result(json_data):
         """Получить данные bbox из json в формате [x1,y1,x2,y2]"""
         box = json.loads(json_data)[0]['box']
-        print(list(box.values()))
+        # print(list(box.values()))
         return list(box.values())
 
     @staticmethod

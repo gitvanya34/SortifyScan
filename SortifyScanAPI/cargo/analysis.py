@@ -164,8 +164,8 @@ class CargoAnalysis:
     def cut_at_intersection(line_strings):
         """ Обрезает прямые по ресечениям до четырехугольника"""
         lines = []
-        print(line_strings)
-        print(len(line_strings))
+        # print(line_strings)
+        # print(len(line_strings))
         for i in range(len(line_strings)):
             if i == len(line_strings) - 1:
                 points = line_strings[i].intersection([line_strings[i - 1], line_strings[0]])

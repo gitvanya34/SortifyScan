@@ -277,7 +277,6 @@ class Borders:
 
     def draw_gabarity(self, box: Boxwgh, image, show=False, save_dir_path=None, name_img="Name"):
         def draw(edge, lenght):
-            print(edge[0])
             x = [edge[0][0], edge[1][0]]
             y = [edge[0][1], edge[1][1]]
             plt.plot(x, y, linewidth=3, linestyle='-')

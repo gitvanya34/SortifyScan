@@ -31,6 +31,8 @@ if __name__ == "__main__":
         CargoProcessing.show_image_after_ultralytics(result_det)
 
         # clean_memory_for_gpu()
+        if result_det.bbox is None:
+            continue
 
         bbox = CargoProcessing.get_bbox_from_result(CargoProcessing.result_to_json(result_det))
         result_seg = detection.segment_cargo_bboxes(result_det[0].orig_img, bbox)
@@ -47,9 +49,7 @@ if __name__ == "__main__":
         for config in configurations:
             result_side = detection.segmentation_of_the_side(result_seg, result_det, crop=config['crop'],
                                                              bgcolor=config['bgcolor'])
-            print(result_side[0].names)
-            print(len({0: '0', 1: '1', 2: '2', 3: '3'}))
-            print(len(result_side[0].names))
+
             CargoProcessing.show_image_after_ultralytics(result_side[0])
             if len(result_side[0].names) == config['expected_length']:
                 point_cloud = CargoAnalysis.get_xy_edges(result_side, bbox) if config['crop'] \
@@ -58,13 +58,13 @@ if __name__ == "__main__":
         else:
             print("Нет конфигураций")
 
-        print(point_cloud)
+        # print(point_cloud)
         CargoAnalysis.draw_point_cloud_edges(point_cloud)  # TODO: передать размеры изображения аргументом
 
         line_strings_all = CargoAnalysis.approximate_point_cloud(point_cloud)
         CargoAnalysis.draw_edges(line_strings_all, result_det.orig_img)
 
-        print(line_strings_all)
+        # print(line_strings_all)
         # Формируем словарь граней c координатами
         sides_dict = {"sides": []}
         for i, side in enumerate(line_strings_all):
