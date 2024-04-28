@@ -194,8 +194,8 @@ class Edge:
                 jc = json_data['line']['centoroid']['xy']
                 self.centroid = Point(jc[0], jc[1])
 
-            self.alpha, self.beta = self.linear_equation(self.point_1.x, self.point_1.y,
-                                                         self.point_2.x, self.point_2.y)
+            # self.alpha, self.beta = self.linear_equation(self.point_1.x, self.point_1.y,
+            #                                              self.point_2.x, self.point_2.y)
 
     def get_edge(self):
         return [self.point_1.get_xy(), self.point_2.get_xy()]
@@ -213,12 +213,12 @@ class Edge:
             return self.distance(p1[0], p1[1], p2[0], p2[1])
         return None
 
-    @staticmethod
-    def linear_equation(x1, y1, x2, y2):
-        a = (y2 - y1) / (x2 - x1)
-        b = y1 - a * x1
-        # print(f"Уравнение прямой: y = {a}x + {b}")
-        return a, b
+    # @staticmethod
+    # def linear_equation(x1, y1, x2, y2):
+    #     a = (y2 - y1) / (x2 - x1)
+    #     b = y1 - a * x1
+    #     # print(f"Уравнение прямой: y = {a}x + {b}")
+    #     return a, b
 
     @staticmethod
     def distance(x1, y1, x2, y2):

@@ -62,7 +62,7 @@ if __name__ == "__main__":
         CargoAnalysis.draw_point_cloud_edges(point_cloud)  # TODO: передать размеры изображения аргументом
 
         line_strings_all = CargoAnalysis.approximate_point_cloud(point_cloud)
-        CargoAnalysis.draw_edges(line_strings_all, results_det[0].orig_img)
+        CargoAnalysis.draw_edges(line_strings_all, result_det.orig_img)
 
         print(line_strings_all)
         # Формируем словарь граней c координатами
@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
         # print(borders.test("bo", " "))
         print(borders.get_gabarity(box,
-                                   image=results_det[0].orig_img,
+                                   image=result_det.orig_img,
                                    show=False,
                                    save_dir_path=folder_name,
                                    name_img=n_shot))
