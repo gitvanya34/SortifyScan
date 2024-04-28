@@ -1,3 +1,5 @@
+import os
+
 from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
@@ -269,35 +271,11 @@ class Borders:
             mesh.append([[dxl, -dyl], [dxr, -dyr]])
         return mesh
 
-    def draw_mesh(self, mesh, path=PATH_PRIVATE_IMAGE):
-        borders_line = [self.up.get_edge(),
-                        self.down.get_edge(),
-                        self.left.get_edge(),
-                        self.right.get_edge()]
-
-        print("borders_line", borders_line)
-        print("mesh", mesh)
-        for m in borders_line:
-            print(m)
-            x_values = [m[0][0], m[1][0]]
-            y_values = [-m[0][1], -m[1][1]]
-            plt.plot(x_values, y_values, color='red', linewidth=0.5, linestyle='-')
-
-        for m in mesh:
-            print(m)
-            x_values = [m[0][0], m[1][0]]
-            y_values = [m[0][1], m[1][1]]
-            plt.plot(x_values, y_values, color='blue', linewidth=0.5, linestyle='-')
-
-        image = Image.open(path)
-        plt.imshow(image)
-        plt.show()
-
     def get_orto_coords(self, edge: Edge):
         return cv2.perspectiveTransform(np.array(edge.get_edge(), dtype=np.float32)
                                         .reshape(-1, 1, 2), self.perspective_matrix)
 
-    def draw_gabarity(self, box: Boxwgh, path=PATH_PRIVATE_IMAGE):
+    def draw_gabarity(self, box: Boxwgh, image, show=False, save_dir_path=None, name_img="Name"):
         def draw(edge, lenght):
             print(edge[0])
             x = [edge[0][0], edge[1][0]]
@@ -313,12 +291,20 @@ class Borders:
         edges = [box.front_side.down_edge, box.front_side.left_edge, box.up_side.left_edge]
         for edge in edges:
             draw(edge.get_edge(), edge.length_m)
-        image = Image.open(path)
+
         plt.imshow(image)
-        plt.show()
+        # Путь для сохранения изображения
+        if save_dir_path is not None:
+            image_path = os.path.join(save_dir_path, f'{name_img}.png')
+            plt.savefig(image_path)
+            print(f"Изображение {name_img}.png успешно сохранено в папке: {image_path}")
+
+        if show:
+            plt.show()
+        plt.close()
 
     # TODO проверить после контрукторов
-    def get_gabarity(self, box: Boxwgh):
+    def get_gabarity(self, box: Boxwgh, image, show=False, save_dir_path=None, name_img="Name"):
         def distance(x1, y1, x2, y2):
             return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
@@ -366,10 +352,15 @@ class Borders:
         print(
             f"Высота (0.381м): {box.length_y}м; delta {(height - box.length_y) * 100}см, %{(height - box.length_y) * 100 / box.length_y}")
 
+        self.draw_gabarity(box,
+                           show=show,
+                           image=image,
+                           save_dir_path=save_dir_path,
+                           name_img=name_img)
         return
 
-    def draw_image_orto(self, path=PATH_PRIVATE_IMAGE):
-        image = cv2.imread(path)
+    def draw_image_orto(self, image):
+        # image = cv2.imread(path)
         # Применение преобразования перспективы к изображению
         perspective_image = cv2.warpPerspective(image, self.perspective_matrix,
                                                 (int(max(self.up.length_m * self.scale, self.down.length_m)) + 200,
@@ -377,7 +368,7 @@ class Borders:
         plt.imshow(perspective_image)
         plt.show()
 
-    def test(self, front_side, up_side, path = PATH_PRIVATE_IMAGE):
+    def test(self, front_side, up_side, path=PATH_PRIVATE_IMAGE):
         # Исходное изображение
         image = cv2.imread(path)
         # Применение преобразования перспективы к изображению

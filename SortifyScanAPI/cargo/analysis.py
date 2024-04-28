@@ -12,7 +12,7 @@ class CargoAnalysis:
             return np.sqrt((xs[0] - xs[1]) ** 2 + (ys[0] - ys[1]) ** 2)
 
         return distance(c.ARR_LENT_DOWN[:, 0], -c.ARR_LENT_DOWN[:, 1]) / \
-               distance(c.ARR_LENT_UP[:, 0], -c.ARR_LENT_UP[:, 1])
+            distance(c.ARR_LENT_UP[:, 0], -c.ARR_LENT_UP[:, 1])
 
     @staticmethod
     def draw_point_cloud_edges(xy: list, size=None):
@@ -46,12 +46,14 @@ class CargoAnalysis:
         plt.show()
 
     @staticmethod
-    def get_xy_edges(result, bbox):
+    def get_xy_edges(result, bbox=None):
         # for r in result:
         #   print(len(r.masks.xy[0]))
         #   print(len(r.masks.xy[1]))
         #   print(len(r.masks.xy[2]))
         #   print(len(r.masks.xy[3]))
+        if bbox is None:
+            bbox = [0, 0]
         r = result[0]
 
         bbx1, bby1 = bbox[0], bbox[1]
@@ -79,7 +81,7 @@ class CargoAnalysis:
         return line_strings_all
 
     @staticmethod
-    def draw_edges(line_strings_all: list):
+    def draw_edges(line_strings_all: list, image):
         def draw_line_strings(lines):
             x_line, y_line = [], []
             for line in lines:
@@ -102,7 +104,7 @@ class CargoAnalysis:
         plt.plot(c.ARR_LENT_DOWN[:, 0], c.ARR_LENT_DOWN[:, 1])
         plt.plot(c.ARR_LENT_UP[:, 0], c.ARR_LENT_UP[:, 1])
         # Открываем изображение с помощью Pillow
-        image = Image.open(c.PATH_BEGIN_IMAGE)
+        # image = Image.open(c.PATH_BEGIN_IMAGE)
         # Наложение графика на изображение
         plt.imshow(image)
 
@@ -162,11 +164,15 @@ class CargoAnalysis:
     def cut_at_intersection(line_strings):
         """ Обрезает прямые по ресечениям до четырехугольника"""
         lines = []
+        print(line_strings)
+        print(len(line_strings))
         for i in range(len(line_strings)):
             if i == len(line_strings) - 1:
                 points = line_strings[i].intersection([line_strings[i - 1], line_strings[0]])
             else:
                 points = line_strings[i].intersection([line_strings[i - 1], line_strings[i + 1]])
             lines.append(LineString([points[0].coords[0], points[1].coords[0]]))
+            # если тут дропает значит не правильно сегментирует стороны
+        #     вариант дропать лишнее логическим вычитанием из большего меньшее
 
         return lines

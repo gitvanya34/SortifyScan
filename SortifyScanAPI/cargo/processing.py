@@ -25,8 +25,8 @@ class CargoProcessing:
         """
 
         slash = {'Windows': '\\', 'Linux': '/'}
-        image = Image.open(result[0].save_dir + slash[platform.system()] + \
-                           result[0].path.split(slash[platform.system()])[-1])
+        image = Image.open(result.save_dir + slash[platform.system()] + \
+                           result.path.split(slash[platform.system()])[-1])
 
         plt.imshow(image)
         plt.show()
