@@ -368,58 +368,58 @@ class Borders:
         plt.imshow(perspective_image)
         plt.show()
 
-    def test(self, front_side, up_side, path=PATH_PRIVATE_IMAGE):
-        # Исходное изображение
-        image = cv2.imread(path)
-        # Применение преобразования перспективы к изображению
-        perspective_image = cv2.warpPerspective(image, self.perspective_matrix,
-                                                (int(max(self.up.length_m * self.scale, self.down.length_m)) + 200,
-                                                 int(max(self.left.length_m * self.scale, self.right.length_m))))
-        plt.imshow(perspective_image)
-        plt.show()
-
-        # Инвертирование матрицы преобразования
-        # inverse_perspective_matrix = np.linalg.inv(perspective_matrix)
-
-        # Известные координаты точек на изображении
-        image_coords_unknown = np.array(
-            [[277, 338], [228, 218], [487, 302], [267, 189], [515, 155], [217, 80], [414, 59]], dtype=np.float32)
-
-        # Преобразование координат изображения в координаты реального мира
-        world_coords_unknown = cv2.perspectiveTransform(image_coords_unknown.reshape(-1, 1, 2),
-                                                        self.perspective_matrix)
-
-        print()
-        print(world_coords_unknown[0][0])
-        print(world_coords_unknown[1][0])
-        print(world_coords_unknown[2][0])
-        print()
-
-        def draw(p1, p2):
-            x_values = [p1[0][0], p2[0][0]]
-            y_values = [p1[0][1], p2[0][1]]
-            plt.plot(x_values, y_values, color='red', linewidth=0.5, linestyle='-')
-
-        # draw(world_coords_unknown[0], world_coords_unknown[1])
-        draw(world_coords_unknown[0], world_coords_unknown[2])
-        draw(world_coords_unknown[0], world_coords_unknown[3])
-        draw(world_coords_unknown[3], world_coords_unknown[4])
-        draw(world_coords_unknown[5], world_coords_unknown[6])
-
-        plt.imshow(perspective_image)
-        plt.show()
-
-        left_down = np.linalg.norm(world_coords_unknown[0] - world_coords_unknown[1]) / self.scale
-        front_down = np.linalg.norm(world_coords_unknown[0] - world_coords_unknown[2]) / self.scale
-        front_left = np.linalg.norm(world_coords_unknown[0] - world_coords_unknown[3]) / self.scale
-        front_up = np.linalg.norm(world_coords_unknown[3] - world_coords_unknown[4]) / self.scale
-        up_up = np.linalg.norm(world_coords_unknown[5] - world_coords_unknown[6]) / self.scale
-        up_left = np.linalg.norm(world_coords_unknown[3] - world_coords_unknown[5]) / self.scale
-
-        height = front_left / (front_up / front_down)
-        width = front_down
-        length = up_left / (up_up / front_up) / (front_up / front_down)
-
-        print(f"Длина (0.569м): {length}м; delta {(0.569 - length) * 100}см")
-        print(f"Ширина (0.516м): {width}м; delta {(0.516 - width) * 100}см")
-        print(f"Высота (0.381м): {height}м; delta {(0.381 - height) * 100}см")
+    # def test(self, front_side, up_side, path=PATH_PRIVATE_IMAGE):
+    #     # Исходное изображение
+    #     image = cv2.imread(path)
+    #     # Применение преобразования перспективы к изображению
+    #     perspective_image = cv2.warpPerspective(image, self.perspective_matrix,
+    #                                             (int(max(self.up.length_m * self.scale, self.down.length_m)) + 200,
+    #                                              int(max(self.left.length_m * self.scale, self.right.length_m))))
+    #     plt.imshow(perspective_image)
+    #     plt.show()
+    #
+    #     # Инвертирование матрицы преобразования
+    #     # inverse_perspective_matrix = np.linalg.inv(perspective_matrix)
+    #
+    #     # Известные координаты точек на изображении
+    #     image_coords_unknown = np.array(
+    #         [[277, 338], [228, 218], [487, 302], [267, 189], [515, 155], [217, 80], [414, 59]], dtype=np.float32)
+    #
+    #     # Преобразование координат изображения в координаты реального мира
+    #     world_coords_unknown = cv2.perspectiveTransform(image_coords_unknown.reshape(-1, 1, 2),
+    #                                                     self.perspective_matrix)
+    #
+    #     print()
+    #     print(world_coords_unknown[0][0])
+    #     print(world_coords_unknown[1][0])
+    #     print(world_coords_unknown[2][0])
+    #     print()
+    #
+    #     def draw(p1, p2):
+    #         x_values = [p1[0][0], p2[0][0]]
+    #         y_values = [p1[0][1], p2[0][1]]
+    #         plt.plot(x_values, y_values, color='red', linewidth=0.5, linestyle='-')
+    #
+    #     # draw(world_coords_unknown[0], world_coords_unknown[1])
+    #     draw(world_coords_unknown[0], world_coords_unknown[2])
+    #     draw(world_coords_unknown[0], world_coords_unknown[3])
+    #     draw(world_coords_unknown[3], world_coords_unknown[4])
+    #     draw(world_coords_unknown[5], world_coords_unknown[6])
+    #
+    #     plt.imshow(perspective_image)
+    #     plt.show()
+    #
+    #     left_down = np.linalg.norm(world_coords_unknown[0] - world_coords_unknown[1]) / self.scale
+    #     front_down = np.linalg.norm(world_coords_unknown[0] - world_coords_unknown[2]) / self.scale
+    #     front_left = np.linalg.norm(world_coords_unknown[0] - world_coords_unknown[3]) / self.scale
+    #     front_up = np.linalg.norm(world_coords_unknown[3] - world_coords_unknown[4]) / self.scale
+    #     up_up = np.linalg.norm(world_coords_unknown[5] - world_coords_unknown[6]) / self.scale
+    #     up_left = np.linalg.norm(world_coords_unknown[3] - world_coords_unknown[5]) / self.scale
+    #
+    #     height = front_left / (front_up / front_down)
+    #     width = front_down
+    #     length = up_left / (up_up / front_up) / (front_up / front_down)
+    #
+    #     print(f"Длина (0.569м): {length}м; delta {(0.569 - length) * 100}см")
+    #     print(f"Ширина (0.516м): {width}м; delta {(0.516 - width) * 100}см")
+    #     print(f"Высота (0.381м): {height}м; delta {(0.381 - height) * 100}см")
