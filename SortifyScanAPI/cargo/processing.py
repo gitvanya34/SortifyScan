@@ -59,7 +59,7 @@ class CargoProcessing:
         Параметр:
         """
         for r in result_seg:
-            img = np.copy(r.orig_img)
+            img = np.copy(cv2.cvtColor(r.orig_img, cv2.COLOR_GRAY2BGR))
             img_name = Path(r.path).stem
 
             # iterate each object contour
