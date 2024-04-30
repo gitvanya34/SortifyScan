@@ -1,101 +1,130 @@
+import gc
 import json
-import cargo
+import os
+
+import cv2
+import torch
+from matplotlib import pyplot as plt
+
+# from cargo import CargoDetection, CargoAnalysis, CargoProcessing
+from cargo import *
 import boxwgh
-# def case1():
-#     result = cargo.CargoDetection.detect_cargo()
-#     show_image_after_ultralytics(result)
-#
-#     clean_memory_for_gpu()
-#
-#     bbox = get_bbox_from_result(result_to_json(result))
-#     result = segmentation_bboxes(result[0].orig_img, bbox)
-#     show_image_after_ultralytics(result)
-#
-#     result_side = segmentation_of_the_side(result, crop = True, bgcolor = 'black')
-#     show_image_after_ultralytics(result_side)
-#
-#     point_cloud = get_xy_edges(result_side, bbox)#TODO bbox если кроп передавать нормаьный bbox сделать проверку
-#     draw_point_cloud_edges(point_cloud)# TODO: передать размеры изображения аргументом
-#
-#
-#     line_strings_all = approximate_point_cloud(point_cloud, size = [640,640])
-#     draw_edges(line_strings_all, size = [640,640])
-#
-#     print(line_strings_all)
-#     # Формируем словарь граней c координатами
-#     sides_dict = {"sides":[]}
-#     for i, side in enumerate(line_strings_all):
-#       edge_dict = {"edges":[]}
-#       for j, edge in enumerate(side):
-#         edge_dict[f"edges"].append({f"line": {"xy": [[edge.xy[0][0], edge.xy[1][0]], [edge.xy[0][1], edge.xy[1][1]]],\
-#                                               "centoroid": {"xy" : [edge.centroid.xy[0][0],edge.centroid.xy[1][0]]}}})
-#       sides_dict[f"sides"].append(edge_dict)
-#
-#     # Формируем словарь граней c нормальными
-#
-#
-#     # добавляем на будущее словарь центрроидов грани
-#     return sides_dict
-import numpy as np
-
-from privateconstants import PATH_PRIVATE_IMAGE
+from export import ExportMedia
 
 
-def distance(xs, ys):
-    return np.sqrt((xs[0] - xs[1]) ** 2 + (ys[0] - ys[1]) ** 2)
+def clean_memory_for_gpu():
+    torch.cuda.empty_cache()
+    gc.collect()
 
 
-def search_lowest_centroid_edges(sd):
-    centroids = []
+def case2():
+    # # Применение кластеризации методом k-средних
+    # pixels = image.reshape((-1, 3))
+    # pixels = np.float32(pixels)
+    # criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 1000, 0.1)
+    # k = 4
+    # _, labels, centers = cv2.kmeans(pixels, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+    # centers = np.uint8(centers)
+    # segmented_image = centers[labels.flatten()]
+    # segmented_image = segmented_image.reshape(image.shape)
 
-    for i in sd['sides']:
-        c = []
-        for j in i['edges']:
-            c.append(j['line']['centoroid']['xy'])
-        centroids.append(c)
-    print(centroids)
-    min_centroids = sd['sides'][0]['edges'][0]['line']['centoroid']['xy'][1]
+    image = cv2.imread(
+        'D:\\StudentData\\Project\\Program\\SortifyScan\\ConveyorEmulator\\render\\untitled — копия (2).png')  # Загрузка в оттенках серого
+    # Применение пороговой сегментации
+    # for i in range(0,255):
+    #     print(i)
 
-    return min_centroids
-
-
-def search_down_edge(sd):
-    lowest_edges = []
-    min_centroids = search_lowest_centroid_edges(sd)
-    for i in sd['sides']:
-        for j in i['edges']:
-            if j['line']['centoroid']['xy'][1] < min_centroids:
-                min_centroids = j['line']['centoroid']['xy'][1]
-                lowest_edges = j
-    return lowest_edges
+    # cv2.imwrite(f'D:\\StudentData\\Project\\Program\\SortifyScan\\runs\\TESTCV\\{i}.png',
+    #            cv2.threshold(image, i, 255, cv2.THRESH_BINARY)[1])
 
 
-def proportion_work_area():
-    left_border_dist = distance(cargo.ARR_LENT_LEFT[0], cargo.ARR_LENT_LEFT[1])
-    right_border_dist = distance(cargo.ARR_LENT_RIGHT[0], cargo.ARR_LENT_RIGHT[1])
-    print(left_border_dist, right_border_dist, left_border_dist/right_border_dist)
+# Загрузка изображения
+def check_obj_in_area(bbox):
+    return min(ARR_LENT_UP[:, 1]) < bbox[1] < max(ARR_LENT_DOWN[:, 1]) and min(ARR_LENT_UP[:, 1]) < bbox[1] < max(ARR_LENT_DOWN[:, 1])
+
+
+
+def case1():
+    detection = CargoDetection(PATH_WEIGHTS_YOLO, PATH_WEIGHTS_SAM, PATH_WEIGHTS_SEGYOLO9, PATH_BEGIN_IMAGE)
+
+    results_det = detection.detect_cargo()
+    export = ExportMedia()
+    for n_shot, result_det in enumerate(results_det):
+        print(f"\nОбработка кадра {n_shot}\n")
+        # try:
+        #     if len(result_det.boxes.xyxy) == 0: raise Exception(f"No detections frame {n_shot}")
+
+        # CargoProcessing.show_image_after_ultralytics(result_det,
+        #                                              n_shot=n_shot,
+        #                                              save_dir_path=export.folder_name_yolo)
+        ExportMedia.export_images(n_shot=n_shot, img=cv2.cvtColor(result_det.orig_img, cv2.COLOR_BGR2RGB),
+                                  path=export.folder_name_root)
+        if len(result_det.boxes.xyxy) == 0:
+            continue
+        json_result_detection = CargoProcessing.result_to_json(result_det)
+        print(json_result_detection)
+        bbox = CargoProcessing.get_bbox_from_result(json_result_detection)
+        check_obj_in_area(bbox)
+        CargoProcessing.show_image_detection(result_det, n_shot, export.folder_name_yolo)
+        result_seg = detection.segment_cargo_bboxes_SAM(result_det.orig_img, bbox)[0]
+
+        clean_memory_for_gpu()
+        CargoProcessing.show_image_after_ultralytics(result_seg,
+                                                     n_shot=n_shot,
+                                                     save_dir_path=export.folder_name_sam)
+
+        result_side = detection.segmentation_of_the_side(result_seg,
+                                                         result_det,
+                                                         False,
+                                                         "white",
+                                                         n_shot=n_shot,
+                                                         path_dir_segment=export.folder_name_segmentation,
+                                                         path_dir_points=export.folder_name_points,
+                                                         )
+
+        if not check_obj_in_area(bbox):
+            print(f"Объект не в рабочей зоне {n_shot}")
+            continue
+
+        point_cloud = CargoAnalysis.get_xy_edges_OpenCV(result_side)
+
+        CargoAnalysis.draw_point_cloud_edges(point_cloud)  # TODO: передать размеры изображения аргументом
+
+        line_strings_all = CargoAnalysis.approximate_point_cloud(point_cloud)
+
+        CargoAnalysis.draw_edges(line_strings_all,
+                                 cv2.cvtColor(result_det.orig_img, cv2.COLOR_BGR2RGB),
+                                 n_shot,
+                                 export.folder_name_bbox, )
+
+        # Формируем словарь граней c координатами
+        sides_dict = {"sides": []}
+        for i, side in enumerate(line_strings_all):
+            edge_dict = {"edges": []}
+            for j, edge in enumerate(side):
+                edge_dict[f"edges"].append(
+                    {f"line": {"xy": [[edge.xy[0][0], -edge.xy[1][0]], [edge.xy[0][1], -edge.xy[1][1]]],
+                               "centoroid": {"xy": [edge.centroid.xy[0][0], -edge.centroid.xy[1][0]]}}})
+            sides_dict[f"sides"].append(edge_dict)
+        box = boxwgh.Boxwgh(sides_dict)
+        borders = boxwgh.Borders(JSON_BORDERS)
+        print(borders.get_gabarity(box,
+                                   image=cv2.cvtColor(result_det.orig_img, cv2.COLOR_BGR2RGB),
+                                   show=False,
+                                   save_dir_path=export.folder_name_result,
+                                   name_img=n_shot))
+        # except Exception as e:
+        #     print(e.args)
+        #     plt.close()
+        #     continue
 
 
 if __name__ == "__main__":
-    sides_dict = cargo.MOCK_SIDES_DICT
-    sides_dict = json.loads(sides_dict.replace("\'", "\""))
-    print(sides_dict['sides'][0]['edges'][0])
+    case1()
 
-    print(search_down_edge(sides_dict))
-    box = boxwgh.Boxwgh()
-    box.front_side.down_edge = boxwgh.Edge(search_down_edge(sides_dict))
-    print(box.front_side.down_edge)
-
-    proportion_work_area()
-    # print(box.equality_edges())
-    print(box)
-    # print(.get_perspective_transform)
-
-    print(cargo.JSON_BORDERS)
-    borders = boxwgh.Borders(cargo.JSON_BORDERS)
-    print(borders.draw_mesh(borders.parallel_mesh()))
-    print(borders)
-    print(borders.get_perspective_transform())
-    # borders.get_perspective_transform()
-
-
+# Длина (0.569м): 0.5537314142752592м; delta 1.5268585724740769см
+# Ширина (0.516м): 0.5097783508300782м; delta 0.622164916992185см
+# Высота (0.381м): 0.4294147491048885м; delta -4.841474910488852см
+# Длина (0.34): 0.33259536851587707м;
+# Ширина (0.563): 0.5482442626953125м;
+# Высота (0.221): 0.3088412796035742м;

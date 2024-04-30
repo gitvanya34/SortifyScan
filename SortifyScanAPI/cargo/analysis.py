@@ -1,8 +1,13 @@
+import copy
+
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 import cargo.constants as c
 from shapely.geometry import LinearRing, LineString
+
+from cargo import constants
+from export import ExportMedia
 
 
 class CargoAnalysis:
@@ -12,10 +17,11 @@ class CargoAnalysis:
             return np.sqrt((xs[0] - xs[1]) ** 2 + (ys[0] - ys[1]) ** 2)
 
         return distance(c.ARR_LENT_DOWN[:, 0], -c.ARR_LENT_DOWN[:, 1]) / \
-               distance(c.ARR_LENT_UP[:, 0], -c.ARR_LENT_UP[:, 1])
+            distance(c.ARR_LENT_UP[:, 0], -c.ARR_LENT_UP[:, 1])
 
     @staticmethod
     def draw_point_cloud_edges(xy: list, size=None):
+        if not constants.DEBUG: return
         if size is None:
             size = [640, 640]
 
@@ -24,7 +30,7 @@ class CargoAnalysis:
 
         plt.xlim([0, size[0]])
         plt.ylim([-size[1], 10])  # -640, 0  , 10потому что не видно врезнюю границу
-
+        print(len(xy))
         x1, y1, x2, y2, x3, y3 = xy
 
         # точки граней
@@ -46,12 +52,14 @@ class CargoAnalysis:
         plt.show()
 
     @staticmethod
-    def get_xy_edges(result, bbox):
+    def get_xy_edges_SAM(result, bbox=None):
         # for r in result:
         #   print(len(r.masks.xy[0]))
         #   print(len(r.masks.xy[1]))
         #   print(len(r.masks.xy[2]))
         #   print(len(r.masks.xy[3]))
+        if bbox is None:
+            bbox = [0, 0]
         r = result[0]
 
         bbx1, bby1 = bbox[0], bbox[1]
@@ -69,17 +77,32 @@ class CargoAnalysis:
         return point_cloud
 
     @staticmethod
+    def get_xy_edges_OpenCV(result):
+        point_cloud = []
+
+        for contour in result:
+            x_coords = contour[:, 0, 0]
+            y_coords = -contour[:, 0, 1]
+            print(len(x_coords), len(y_coords))
+            point_cloud.append(x_coords)
+            point_cloud.append(y_coords)
+
+        return point_cloud
+
+    @staticmethod
     def approximate_point_cloud(point_cloud: list):
         x1, y1, x2, y2, x3, y3 = point_cloud
-
-        line_strings_all = [CargoAnalysis.simplify_polygon(np.c_[x1, y1], epsilon=5),
-                            CargoAnalysis.simplify_polygon(np.c_[x2, y2], epsilon=5),
-                            CargoAnalysis.simplify_polygon(np.c_[x3, y3], epsilon=5)]
+        edge1 = np.c_[x1, y1]
+        edge2 = np.c_[x2, y2]
+        edge3 = np.c_[x3, y3]
+        line_strings_all = [CargoAnalysis.simplify_polygon(edge1, epsilon=5),
+                            CargoAnalysis.simplify_polygon(edge2, epsilon=5),
+                            CargoAnalysis.simplify_polygon(edge3, epsilon=5)]
 
         return line_strings_all
 
     @staticmethod
-    def draw_edges(line_strings_all: list):
+    def draw_edges(line_strings_all: list, image, n_shot, path):
         def draw_line_strings(lines):
             x_line, y_line = [], []
             for line in lines:
@@ -102,11 +125,18 @@ class CargoAnalysis:
         plt.plot(c.ARR_LENT_DOWN[:, 0], c.ARR_LENT_DOWN[:, 1])
         plt.plot(c.ARR_LENT_UP[:, 0], c.ARR_LENT_UP[:, 1])
         # Открываем изображение с помощью Pillow
-        image = Image.open(c.PATH_BEGIN_IMAGE)
+        # image = Image.open(c.PATH_BEGIN_IMAGE)
         # Наложение графика на изображение
-        plt.imshow(image)
 
-        plt.show()
+
+        ExportMedia.export_plt(n_shot=n_shot, plt=plt, path=path)
+
+        if constants.DEBUG:
+            plt.axis('off')
+            plt.imshow(image)
+            plt.show()
+        plt.close()
+
 
     # находим четыре самых больших отрезка и ищем где они последовательное соединены мелочью, затем дропаем мелочь и
     # ищем где пересекаются большие
@@ -114,6 +144,7 @@ class CargoAnalysis:
     def simplify_polygon(points, epsilon):
         """ Упрощение многоугольника с помощью метода Рамера-Дугласа-Пекера сводит к 4тырем сторонам"""
         # Упрощение линии с помощью метода Рамера-Дугласа-Пекера
+
         ring = LinearRing(points).simplify(epsilon)
 
         # Вершины упрощенного многоугольника -1 так как последняя координата повторяется
@@ -162,11 +193,15 @@ class CargoAnalysis:
     def cut_at_intersection(line_strings):
         """ Обрезает прямые по ресечениям до четырехугольника"""
         lines = []
+        # print(line_strings)
+        # print(len(line_strings))
         for i in range(len(line_strings)):
             if i == len(line_strings) - 1:
                 points = line_strings[i].intersection([line_strings[i - 1], line_strings[0]])
             else:
                 points = line_strings[i].intersection([line_strings[i - 1], line_strings[i + 1]])
             lines.append(LineString([points[0].coords[0], points[1].coords[0]]))
+            # если тут дропает значит не правильно сегментирует стороны
+        #     вариант дропать лишнее логическим вычитанием из большего меньшее
 
         return lines
