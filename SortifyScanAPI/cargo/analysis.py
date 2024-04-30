@@ -128,12 +128,11 @@ class CargoAnalysis:
         # image = Image.open(c.PATH_BEGIN_IMAGE)
         # Наложение графика на изображение
 
-
+        plt.imshow(image)
         ExportMedia.export_plt(n_shot=n_shot, plt=plt, path=path)
 
         if constants.DEBUG:
             plt.axis('off')
-            plt.imshow(image)
             plt.show()
         plt.close()
 
