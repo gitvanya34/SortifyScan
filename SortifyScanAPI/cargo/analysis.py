@@ -4,6 +4,8 @@ from PIL import Image
 import cargo.constants as c
 from shapely.geometry import LinearRing, LineString
 
+from cargo import constants
+
 
 class CargoAnalysis:
     @staticmethod
@@ -16,6 +18,7 @@ class CargoAnalysis:
 
     @staticmethod
     def draw_point_cloud_edges(xy: list, size=None):
+        if not constants.DEBUG: return
         if size is None:
             size = [640, 640]
 
@@ -24,7 +27,7 @@ class CargoAnalysis:
 
         plt.xlim([0, size[0]])
         plt.ylim([-size[1], 10])  # -640, 0  , 10потому что не видно врезнюю границу
-
+        print(len(xy))
         x1, y1, x2, y2, x3, y3 = xy
 
         # точки граней
@@ -46,7 +49,7 @@ class CargoAnalysis:
         plt.show()
 
     @staticmethod
-    def get_xy_edges(result, bbox=None):
+    def get_xy_edges_SAM(result, bbox=None):
         # for r in result:
         #   print(len(r.masks.xy[0]))
         #   print(len(r.masks.xy[1]))
@@ -71,6 +74,19 @@ class CargoAnalysis:
         return point_cloud
 
     @staticmethod
+    def get_xy_edges_OpenCV(result):
+        point_cloud = []
+
+        for contour in result:
+            x_coords = contour[:, 0, 0]
+            y_coords = -contour[:, 0, 1]
+            print(len(x_coords), len(y_coords))
+            point_cloud.append(x_coords)
+            point_cloud.append(y_coords)
+
+        return point_cloud
+
+    @staticmethod
     def approximate_point_cloud(point_cloud: list):
         x1, y1, x2, y2, x3, y3 = point_cloud
 
@@ -82,6 +98,8 @@ class CargoAnalysis:
 
     @staticmethod
     def draw_edges(line_strings_all: list, image):
+        if not constants.DEBUG: return
+
         def draw_line_strings(lines):
             x_line, y_line = [], []
             for line in lines:
