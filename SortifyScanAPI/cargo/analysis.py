@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -5,6 +7,7 @@ import cargo.constants as c
 from shapely.geometry import LinearRing, LineString
 
 from cargo import constants
+from export import ExportMedia
 
 
 class CargoAnalysis:
@@ -89,17 +92,17 @@ class CargoAnalysis:
     @staticmethod
     def approximate_point_cloud(point_cloud: list):
         x1, y1, x2, y2, x3, y3 = point_cloud
-
-        line_strings_all = [CargoAnalysis.simplify_polygon(np.c_[x1, y1], epsilon=5),
-                            CargoAnalysis.simplify_polygon(np.c_[x2, y2], epsilon=5),
-                            CargoAnalysis.simplify_polygon(np.c_[x3, y3], epsilon=5)]
+        edge1 = np.c_[x1, y1]
+        edge2 = np.c_[x2, y2]
+        edge3 = np.c_[x3, y3]
+        line_strings_all = [CargoAnalysis.simplify_polygon(edge1, epsilon=5),
+                            CargoAnalysis.simplify_polygon(edge2, epsilon=5),
+                            CargoAnalysis.simplify_polygon(edge3, epsilon=5)]
 
         return line_strings_all
 
     @staticmethod
-    def draw_edges(line_strings_all: list, image):
-        if not constants.DEBUG: return
-
+    def draw_edges(line_strings_all: list, image, n_shot, path):
         def draw_line_strings(lines):
             x_line, y_line = [], []
             for line in lines:
@@ -124,9 +127,16 @@ class CargoAnalysis:
         # Открываем изображение с помощью Pillow
         # image = Image.open(c.PATH_BEGIN_IMAGE)
         # Наложение графика на изображение
-        plt.imshow(image)
 
-        plt.show()
+
+        ExportMedia.export_plt(n_shot=n_shot, plt=plt, path=path)
+
+        if constants.DEBUG:
+            plt.axis('off')
+            plt.imshow(image)
+            plt.show()
+        plt.close()
+
 
     # находим четыре самых больших отрезка и ищем где они последовательное соединены мелочью, затем дропаем мелочь и
     # ищем где пересекаются большие
@@ -134,6 +144,7 @@ class CargoAnalysis:
     def simplify_polygon(points, epsilon):
         """ Упрощение многоугольника с помощью метода Рамера-Дугласа-Пекера сводит к 4тырем сторонам"""
         # Упрощение линии с помощью метода Рамера-Дугласа-Пекера
+
         ring = LinearRing(points).simplify(epsilon)
 
         # Вершины упрощенного многоугольника -1 так как последняя координата повторяется

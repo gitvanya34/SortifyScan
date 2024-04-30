@@ -6,6 +6,7 @@ import numpy as np
 import cv2
 
 from cargo import constants
+from export import ExportMedia
 from privateconstants import PATH_PRIVATE_IMAGE
 
 
@@ -294,11 +295,9 @@ class Borders:
 
         plt.imshow(image)
         # Путь для сохранения изображения
+
         if save_dir_path is not None:
-            image_path = os.path.join(save_dir_path, f'{name_img}.png')
-            plt.axis('off')
-            plt.savefig(image_path, bbox_inches='tight', pad_inches=0, transparent=True)
-            print(f"Изображение {name_img}.png успешно сохранено в папке: {image_path}")
+            ExportMedia.export_plt(name_img, plt, save_dir_path)
 
         if show:
             plt.show()
@@ -361,12 +360,15 @@ class Borders:
         return
 
     def draw_image_orto(self, image):
-        if not constants.DEBUG: return
-        # image = cv2.imread(path)
-        # Применение преобразования перспективы к изображению
         perspective_image = cv2.warpPerspective(image, self.perspective_matrix,
                                                 (int(max(self.up.length_m * self.scale, self.down.length_m)) + 200,
                                                  int(max(self.left.length_m * self.scale, self.right.length_m))))
+
+
+
+        if not constants.DEBUG: return
+        # image = cv2.imread(path)
+        # Применение преобразования перспективы к изображению
         plt.imshow(perspective_image)
         plt.show()
 

@@ -6,7 +6,10 @@ import cv2
 import json
 import platform
 
+from matplotlib import patches
+
 from cargo import constants
+from export import ExportMedia
 
 
 class CargoProcessing:
@@ -19,20 +22,24 @@ class CargoProcessing:
         plt.show()
 
     @staticmethod
-    def show_image_after_ultralytics(result: list):
+    def show_image_after_ultralytics(result: list, save_dir_path , n_shot):
         """Метод вывода изображения после применения модели
         Parameters
         ----------
         result: list
         результат после применения модели
         """
-        if not constants.DEBUG: return
-
         slash = {'Windows': '\\', 'Linux': '/'}
         image = Image.open(result.save_dir + slash[platform.system()] + \
                            result.path.split(slash[platform.system()])[-1])
-
         plt.imshow(image)
+
+        if save_dir_path is not None:
+            ExportMedia.export_plt(n_shot, plt, save_dir_path)
+
+        if not constants.DEBUG:
+            plt.close()
+            return
         plt.show()
 
     @staticmethod
@@ -112,3 +119,26 @@ class CargoProcessing:
                 return iso_crop
             else:
                 return isolated
+
+    @staticmethod
+    def show_image_detection(result_det, n_shot, save_dir_path):
+        data = json.loads(CargoProcessing.result_to_json(result_det))
+
+        fig, ax = plt.subplots()
+        ax.imshow(cv2.cvtColor(result_det.orig_img, cv2.COLOR_BGR2RGB))
+
+        for d in data:
+            print(d)
+            x1, y1 = d["box"]["x1"], d["box"]["y1"]
+            x2, y2 = d["box"]["x2"], d["box"]["y2"]
+            rect = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=1, edgecolor='r', facecolor='none')
+            ax.add_patch(rect)
+            ax.text(x1, y1, f"{d['name']} {d['class']}: {d['confidence']:.2f}", color='r', fontsize=8)
+        plt.axis('off')
+        ExportMedia.export_images(n_shot=n_shot,
+                                  img=cv2.cvtColor(result_det.orig_img, cv2.COLOR_BGR2RGB),
+                                  path=save_dir_path)
+        if constants.DEBUG:
+            plt.show()
+        plt.close()
+
