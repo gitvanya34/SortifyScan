@@ -304,7 +304,7 @@ class Borders:
         plt.close()
 
     # TODO проверить после контрукторов
-    def get_gabarity(self, box: Boxwgh, image, show=False, save_dir_path=None, name_img="Name"):
+    def get_gabarity(self, box: Boxwgh):
         def distance(x1, y1, x2, y2):
             return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
@@ -352,25 +352,17 @@ class Borders:
         print(
             f"Высота (0.381м): {box.length_y}м; delta {(height - box.length_y) * 100}см, %{(height - box.length_y) * 100 / box.length_y}")
 
-        self.draw_gabarity(box,
-                           show=show,
-                           image=image,
-                           save_dir_path=save_dir_path,
-                           name_img=name_img)
         return
 
-    def draw_image_orto(self, image):
+    def draw_image_orto(self, image, save_dir_path, name_img):
         perspective_image = cv2.warpPerspective(image, self.perspective_matrix,
                                                 (int(max(self.up.length_m * self.scale, self.down.length_m)) + 200,
                                                  int(max(self.left.length_m * self.scale, self.right.length_m))))
 
-
-
-        if not constants.DEBUG: return
-        # image = cv2.imread(path)
-        # Применение преобразования перспективы к изображению
         plt.imshow(perspective_image)
-        plt.show()
+        ExportMedia.export_plt(plt=plt, path=save_dir_path, n_shot=name_img)
+        if constants.DEBUG:
+            plt.show()
 
     # def test(self, front_side, up_side, path=PATH_PRIVATE_IMAGE):
     #     # Исходное изображение

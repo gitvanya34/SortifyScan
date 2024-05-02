@@ -1,3 +1,4 @@
+import os
 from copy import copy
 
 import cv2
@@ -95,56 +96,73 @@ class CargoDetection:
 
     def segment_cargo_OpenCV(self, image, n_shot, path_segment, path_points):
         gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        sorted_contours = []
+
+        path_segment_n = os.path.join(path_segment, f"{n_shot}")
+        os.makedirs(path_segment_n)
+
+        path_points_n = os.path.join(path_points, f"{n_shot}")
+        os.makedirs(path_points_n)
         # Применение фильтра Собеля для обнаружения границ TOP
         sobel_x = cv2.Sobel(gray_image, cv2.CV_64F, 1, 0, ksize=5)
         sobel_y = cv2.Sobel(gray_image, cv2.CV_64F, 0, 1, ksize=5)
         gradient_magnitude = cv2.magnitude(sobel_x, sobel_y)
-        _, segmented_image = cv2.threshold(gradient_magnitude, 255, 255, cv2.THRESH_BINARY)
+        for thresh in range(250, 255, 20):
 
-        # Отображение сегментированного изображения
-        ExportMedia.export_images(n_shot=n_shot, img=segmented_image, path=path_segment)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
+            _, segmented_image = cv2.threshold(gradient_magnitude, thresh, 255, cv2.THRESH_BINARY)
 
-        # Отображение изображения с помощью Matplotlib
+            ExportMedia.export_images(n_shot=thresh, img=segmented_image, path=path_segment_n)
+            ExportMedia.export_images(n_shot=n_shot, img=segmented_image, path=path_segment)
 
-        contours, hierarchy = cv2.findContours(segmented_image.astype('uint8'), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        contour_image = np.zeros_like(segmented_image)
-        cv2.drawContours(contour_image, contours, -1, color=255, thickness=1)
-        white_pixels = np.where(contour_image == 255)
-        # # plt.scatter(white_pixels[1], white_pixels[0], c='black', s=1)
-        plt.gca().invert_yaxis()
-        sorted_contours = sorted(contours, key=lambda x: -len(x))
-        for i, contour in enumerate(sorted_contours):
-            print(f"Количество точек в контуре {i}: {len(contour)}")
-        # TODO написать критерии возврата в работу
-        if len(sorted_contours) > 3:
-            plt.plot(sorted_contours[1][:, 0, 0], sorted_contours[1][:, 0, 1], linewidth=1, c='blue')
-            plt.plot(sorted_contours[2][:, 0, 0], sorted_contours[2][:, 0, 1], linewidth=1, c='red')
-            plt.plot(sorted_contours[3][:, 0, 0], sorted_contours[3][:, 0, 1], linewidth=1, c='green')
-        elif len(sorted_contours) == 3:
-            plt.plot(sorted_contours[1][:, 0, 0], sorted_contours[1][:, 0, 1], linewidth=1, c='blue')
-            plt.plot(sorted_contours[2][:, 0, 0], sorted_contours[2][:, 0, 1], linewidth=1, c='red')
-            plt.plot(sorted_contours[0][:, 0, 0], sorted_contours[0][:, 0, 1], linewidth=1, c='green')
-        else:
-            for contour in sorted_contours:
-                plt.plot(contour[:, 0, 0], contour[:, 0, 1], linewidth=1, c='red')
+            contours, hierarchy = cv2.findContours(segmented_image.astype('uint8'), cv2.RETR_TREE,
+                                                   cv2.CHAIN_APPROX_NONE)
+            contour_image = np.zeros_like(segmented_image)
+            cv2.drawContours(contour_image, contours, -1, color=255, thickness=1)
+            white_pixels = np.where(contour_image == 255)
+            # # plt.scatter(white_pixels[1], white_pixels[0], c='black', s=1)
+            plt.gca().invert_yaxis()
+            # sorted_contours = sorted(contours, key=lambda x: -len(x))
+            sorted_contours = sorted(contours, key=cv2.contourArea, reverse=True)
 
-        ExportMedia.export_plt(n_shot=n_shot, plt=plt, path=path_points)
+            print(
+                f"\nНайдено {len(sorted_contours)} контуров, Количество точек в контурах: {[len(contour) for contour in sorted_contours]}\n")
+            # TODO написать критерии возврата в работу
 
-        if constants.DEBUG:
-            plt.axis('off')
-            plt.imshow(image)
-            plt.show()
+            for c in sorted_contours:
+                if len(c) > 150:
+                    plt.plot(c[:, 0, 0], c[:, 0, 1], linewidth=1)
+            #  elif len(sorted_contours) == 3:
+            #     plt.plot(sorted_contours[1][:, 0, 0], sorted_contours[1][:, 0, 1], linewidth=1, c='blue')
+            #     plt.plot(sorted_contours[2][:, 0, 0], sorted_contours[2][:, 0, 1], linewidth=1, c='red')
+            #     plt.plot(sorted_contours[0][:, 0, 0], sorted_contours[0][:, 0, 1], linewidth=1, c='green')
+            # else:
+            #     for contour in sorted_contours:
+            #         plt.plot(contour[:, 0, 0], contour[:, 0, 1], linewidth=1, c='red')
 
-        plt.close()
+            ExportMedia.export_plt(n_shot=thresh, plt=plt, path=path_points_n)
+            ExportMedia.export_plt(n_shot=n_shot, plt=plt, path=path_points)
 
-        if len(sorted_contours) > 3:
-            return [sorted_contours[1], sorted_contours[2], sorted_contours[3]]
-        elif len(sorted_contours) == 3:
-            return [sorted_contours[1], sorted_contours[2], sorted_contours[0]]
-        else:
-            return [[], [], []]
+            if constants.DEBUG:
+                plt.axis('off')
+                plt.imshow(image)
+                plt.show()
+
+            plt.close()
+
+        # plt.plot(sorted_contours[0][:, 0, 0], sorted_contours[0][:, 0, 1], linewidth=1, color="red")
+        # plt.plot(sorted_contours[1][:, 0, 0], sorted_contours[1][:, 0, 1], linewidth=1, color="green")
+        # plt.plot(sorted_contours[2][:, 0, 0], sorted_contours[2][:, 0, 1], linewidth=1, color="blue")
+        # plt.plot(sorted_contours[3][:, 0, 0], sorted_contours[3][:, 0, 1], linewidth=1, color="orange")
+        #
+        # plt.show()
+        #
+        return sorted_contours[1:] # исключили первый элемент
+        # if len(sorted_contours) > 3:
+        #     return [sorted_contours[1], sorted_contours[2], sorted_contours[3]]
+        # elif len(sorted_contours) == 3:
+        #     return [sorted_contours[1], sorted_contours[2], sorted_contours[0]]
+        # else:
+        #     return [[], [], []]
 
     def segmentation_of_the_side(self,
                                  result_seg,
