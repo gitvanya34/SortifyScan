@@ -3,6 +3,9 @@ import copy
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
+from scipy.optimize import minimize
+from shapely import Polygon, MultiPoint
+
 import cargo.constants as c
 from shapely.geometry import LinearRing, LineString
 
@@ -84,14 +87,19 @@ class CargoAnalysis:
             x_coords = contour[:, 0, 0]
             y_coords = -contour[:, 0, 1]
             print(len(x_coords), len(y_coords))
-            point_cloud.append(x_coords)
-            point_cloud.append(y_coords)
+            point_cloud.append([x_coords, y_coords])
 
         return point_cloud
 
     @staticmethod
     def approximate_point_cloud(point_cloud: list):
-        x1, y1, x2, y2, x3, y3 = point_cloud
+        # на вход [[[x],[y]],[..]]
+
+        # TODO сделать объединения пересекаемых полигонов после апроксимации
+        x1, y1, = point_cloud[0]
+        x2, y2 = point_cloud[1]
+        x3, y3 = point_cloud[2]
+
         edge1 = np.c_[x1, y1]
         edge2 = np.c_[x2, y2]
         edge3 = np.c_[x3, y3]
@@ -136,54 +144,141 @@ class CargoAnalysis:
             plt.show()
         plt.close()
 
-
     # находим четыре самых больших отрезка и ищем где они последовательное соединены мелочью, затем дропаем мелочь и
     # ищем где пересекаются большие
     @staticmethod
     def simplify_polygon(points, epsilon):
+
         """ Упрощение многоугольника с помощью метода Рамера-Дугласа-Пекера сводит к 4тырем сторонам"""
+
+        def xy_to_line_strings(xy):
+            line_strings = []
+            for i in range(len(xy) - 1):
+                line_strings.append(LineString([xy[i], xy[i + 1]]))
+            return line_strings
+
+
         # Упрощение линии с помощью метода Рамера-Дугласа-Пекера
 
-        ring = LinearRing(points).simplify(epsilon)
-
+        ring = LinearRing(points).convex_hull.simplify(epsilon)
+        print(ring)
+        rot_rect = LinearRing(points).simplify(epsilon).minimum_rotated_rectangle
         # Вершины упрощенного многоугольника -1 так как последняя координата повторяется
-        xy = np.c_[np.array(ring.coords)]
 
-        line_strings = CargoAnalysis.drop_small_line(xy)
+        xy = np.c_[np.array(ring.exterior.coords)]
+        xy_rect = np.c_[np.array(rot_rect.exterior.coords)]
+
+        line_strings = xy_to_line_strings(xy)
+
+        # xy_rect2 = np.c_[np.array(polygon_min_4(line_strings).exterior.coords)]
+        CargoAnalysis.minimize(xy, xy_rect)
+        if c.DEBUG:
+            x = [point[0] for point in xy]
+            y = [point[1] for point in xy]
+            plt.plot(x, y)
+
+            x = [point[0] for point in xy_rect]
+            y = [point[1] for point in xy_rect]
+            plt.plot(x, y)
+
+            plt.show()
+
+        line_strings = CargoAnalysis.drop_small_line(line_strings)
         line_strings = CargoAnalysis.prolongation_segments(line_strings)
         line_strings = CargoAnalysis.cut_at_intersection(line_strings)
 
         return line_strings
 
     @staticmethod
-    def drop_small_line(xy):
+    def minimize(ring, rot_rect):
+        # TODO минимизация четырехугольника на выпуклом описывающем многоугольнике
+        # # Набор точек в формате LineString
+        # points = ring
+        #
+        # def loss_function(vertices):
+        #     approximated_polygon = Polygon(vertices.reshape(-1, 2))
+        #     return -approximated_polygon.area  # Минимизируем площадь, поэтому возвращаем отрицательную площадь
+        #
+        # def constraints(vertices):
+        #     return vertices[0] - vertices[2], vertices[1] - vertices[3]
+        #
+        # initial_guess = rot_rect
+        # print(initial_guess)
+        # # Оптимизация
+        # result = minimize(loss_function, initial_guess, constraints={'type': 'eq', 'fun': constraints})
+        #
+        # # Получение аппроксимированного многоугольника
+        # approximated_polygon = Polygon(result.x.reshape(-1, 2))
+        #
+        #
+        # print("Аппроксимированный четырехугольник:", approximated_polygon)
+        return
+    @staticmethod
+    def drop_small_line(lines):
         """ Возвращает набор 4-рех ребер LineString (сведение до четырехугольника)"""
         # вынесем в отдельный список набор LineString
         xy_line_lenght = []
-        for i in range(len(xy) - 1):
-            line = LineString([xy[i], xy[i + 1]])
+        for line in lines:
             xy_line_lenght.append([line.length, line])
 
-        # найдем 4 самых больших ребра, дропнем мелочь
-        while len(xy_line_lenght) != 4:
-            xy_line_lenght.remove(min(xy_line_lenght))
+        num_edges_to_keep = 4
 
-        # пересоздадим массив без длинны ребер
+        def drop_coords(line1, line2):
+            start1, end1 = line1.coords[0], line1.coords[-1]
+            start2, end2 = line2.coords[0], line2.coords[-1]
+
+            if end1 == start2:
+                return LineString([start1, end2])
+            elif start1 == end2:
+                return LineString([end1, start2])
+            elif start1 == start2:
+                return LineString([end1, end2])
+            elif end1 == end2:
+                return LineString([start1, start2])
+            else:
+                print("говно")
+
+        while len(xy_line_lenght) > num_edges_to_keep:
+            index_min_string = min(range(len(xy_line_lenght)), key=lambda i: xy_line_lenght[i][0])
+            if index_min_string == len(xy_line_lenght) - 1:
+                index_min_string = -1
+            if xy_line_lenght[index_min_string - 1][0] < xy_line_lenght[index_min_string + 1][0]:
+                xy_line_lenght[index_min_string - 1][1] = drop_coords(xy_line_lenght[index_min_string - 1][1],
+                                                                      xy_line_lenght[index_min_string][1])
+                xy_line_lenght[index_min_string - 1][0] = xy_line_lenght[index_min_string - 1][1].length
+            else:
+                xy_line_lenght[index_min_string + 1][1] = drop_coords(xy_line_lenght[index_min_string + 1][1],
+                                                                      xy_line_lenght[index_min_string][1])
+                xy_line_lenght[index_min_string + 1][0] = xy_line_lenght[index_min_string + 1][1].length
+
+            xy_line_lenght.pop(index_min_string)
+
         xy_line_lenght = np.array(xy_line_lenght)
         xy_line_lenght = xy_line_lenght[:, 1]
 
+        if c.DEBUG:
+            for line in xy_line_lenght:
+                x, y = line.xy
+                plt.plot(x, y)
+            # Показываем график
+            plt.show()
         return xy_line_lenght
 
     @staticmethod
     def prolongation_segments(line_strings):
         """ Возвращает масштабированный набор ребер в формате LineString"""
-        # интреполируем отрезки с обоих сторон что бы потом обрезать в пересечениях условно на своюэе длинну
-        for i in range(len(line_strings)):
-            f = list(line_strings[i].coords)
+        # интерполируем отрезки с обеих сторон, что бы потом обрезать в пересечениях условно на своюэе длинну
+        k = 2  # коэффициент пролонгации
 
-            p1 = [f[0][0] * 2 - f[1][0], f[0][1] * 2 - f[1][1]]
-            p2 = [f[1][0] * 2 - f[0][0], f[1][1] * 2 - f[0][1]]
-            line_strings[i] = LineString([p1, p2])
+        for i in range(len(line_strings)):
+            p1 = list(line_strings[i].coords)[0]
+            p2 = list(line_strings[i].coords)[1]
+            dx = p2[0] - p1[0]
+            dy = p2[1] - p1[1]
+            extended_p1 = [p1[0] - dx * k, p1[1] - dy * k]
+            extended_p2 = [p2[0] + dx * k, p2[1] + dy * k]
+
+            line_strings[i] = LineString([extended_p1, extended_p2])
             # x_line, y_line = line_strings[i].xy
 
         return line_strings
@@ -192,9 +287,8 @@ class CargoAnalysis:
     def cut_at_intersection(line_strings):
         """ Обрезает прямые по ресечениям до четырехугольника"""
         lines = []
-        # print(line_strings)
-        # print(len(line_strings))
         for i in range(len(line_strings)):
+
             if i == len(line_strings) - 1:
                 points = line_strings[i].intersection([line_strings[i - 1], line_strings[0]])
             else:

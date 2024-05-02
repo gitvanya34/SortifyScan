@@ -1,6 +1,8 @@
 import gc
 import json
 import os
+import traceback
+import time
 
 import cv2
 import torch
@@ -34,7 +36,10 @@ def case1():
     results_det = detection.detect_cargo()
     export = ExportMedia()
     for n_shot, result_det in enumerate(results_det):
-        if n_shot < 73: continue
+        start_time = time.time()
+
+
+        # if n_shot < 73: continue
         print(f"\nОбработка кадра {n_shot}\n")
         borders = boxwgh.Borders(JSON_BORDERS)
         borders.draw_image_orto(image=cv2.cvtColor(result_det.orig_img, cv2.COLOR_BGR2RGB),
@@ -110,8 +115,11 @@ def case1():
 
         except Exception as e:
             print(e.args)
+            traceback.print_exc()
         finally:
+            print("\nИтерация", n_shot, "заняла", time.time() - start_time, "секунд\n")
             export.make_collage(n_shot)
+
             plt.close()
 
 
