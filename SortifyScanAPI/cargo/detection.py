@@ -107,7 +107,7 @@ class CargoDetection:
         sobel_x = cv2.Sobel(gray_image, cv2.CV_64F, 1, 0, ksize=5)
         sobel_y = cv2.Sobel(gray_image, cv2.CV_64F, 0, 1, ksize=5)
         gradient_magnitude = cv2.magnitude(sobel_x, sobel_y)
-        for thresh in range(250, 255, 20):
+        for thresh in range(100, 101, 20):
 
             _, segmented_image = cv2.threshold(gradient_magnitude, thresh, 255, cv2.THRESH_BINARY)
 

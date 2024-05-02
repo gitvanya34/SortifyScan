@@ -26,7 +26,7 @@ def case2():
 
 # Загрузка изображения
 def check_obj_in_area(bbox):
-    return min(ARR_LENT_UP[:, 1]) < bbox[1] < max(ARR_LENT_DOWN[:, 1]) and min(ARR_LENT_UP[:, 1]) < bbox[3] < max(
+    return max(ARR_LENT_UP[:, 1]) < bbox[1] < min(ARR_LENT_DOWN[:, 1]) and max(ARR_LENT_UP[:, 1]) < bbox[3] < min(
         ARR_LENT_DOWN[:, 1])
 
 
