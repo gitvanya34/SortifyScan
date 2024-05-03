@@ -117,14 +117,14 @@ class CargoAnalysis:
                 x_line += line.xy[0]
                 y_line += line.xy[1]
             y_line[:] = [-i for i in y_line]
-            plt.plot(x_line, y_line, 'o-', linewidth=1)
+            plt.plot(x_line, y_line, 'o-')
 
         plt.figure()
         plt.axes()
         # plt.xlim([0, size[0]])
         # plt.ylim([-size[1], 10])#-640, 0  , 10потому что не видно врезнюю границу
 
-        for line_strings in line_strings_all[:-1]:
+        for line_strings in line_strings_all:
             draw_line_strings(line_strings)
 
         # границы ленты

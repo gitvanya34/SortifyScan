@@ -10,8 +10,11 @@ from datetime import datetime
 
 class ExportMedia:
 
-    def __init__(self):
-        self.folder_name_root = self.make_dirs()
+    def __init__(self, name_root=None):
+        if name_root is None:
+            self.folder_name_root = self.make_dirs()
+        else:
+            self.folder_name_root = name_root
 
         self.folder_name_detection_bbox = os.path.join(self.folder_name_root, "detection_bbox")
         self.folder_name_orig = os.path.join(self.folder_name_root, "orig")
@@ -23,16 +26,16 @@ class ExportMedia:
         self.folder_name_result = os.path.join(self.folder_name_root, "result")
         self.folder_name_collage = os.path.join(self.folder_name_root, "collage")
 
-        os.makedirs(self.folder_name_orig)
-        os.makedirs(self.folder_name_detection_bbox)
-        os.makedirs(self.folder_name_sam)
-        os.makedirs(self.folder_name_segmentation)
-        os.makedirs(self.folder_name_points)
-        os.makedirs(self.folder_name_skeleton)
-        os.makedirs(self.folder_name_orto)
-        os.makedirs(self.folder_name_result)
-
-        os.makedirs(self.folder_name_collage)
+        if name_root is None:
+            os.makedirs(self.folder_name_orig)
+            os.makedirs(self.folder_name_detection_bbox)
+            os.makedirs(self.folder_name_sam)
+            os.makedirs(self.folder_name_segmentation)
+            os.makedirs(self.folder_name_points)
+            os.makedirs(self.folder_name_skeleton)
+            os.makedirs(self.folder_name_orto)
+            os.makedirs(self.folder_name_result)
+            os.makedirs(self.folder_name_collage)
 
         self.folders = {
             self.folder_name_orig: None,
@@ -84,11 +87,7 @@ class ExportMedia:
         self.export_plt(n_shot, plt, self.folder_name_collage)
         plt.close()
 
-    def make_video(self, path, fps=5, target_resolution= (2205, 1826)):
-        # Параметры видео
-        output_video_path = 'output_video.avi'
-        frame_rate = 10  # Кадры в секунду
-
+    def make_video(self, path, fps=5, target_resolution=(2205, 1826)):
         # Путь к папке с изображениями
         images_folder = path
 
@@ -100,9 +99,11 @@ class ExportMedia:
         first_image = cv2.imread(os.path.join(images_folder, image_files[0]))
         height, width, _ = first_image.shape
 
+        filename = os.path.join(self.folder_name_root, f"{self.folder_name_root}.mp4")
         # Инициализируем объект VideoWriter
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Выбираем кодек для сохранения видео
-        out = cv2.VideoWriter(output_video_path, fourcc, fps, target_resolution)
+        out = cv2.VideoWriter(filename, fourcc, fps,
+                              target_resolution)
 
         # Проходимся по каждому изображению, изменяем его размер и добавляем в видео
         for image_file in image_files:
@@ -113,6 +114,7 @@ class ExportMedia:
 
         # Закрываем объект VideoWriter
         out.release()
+        print(f"Сохранено видео {filename}")
 
     @staticmethod
     def export_plt(n_shot, plt, path):

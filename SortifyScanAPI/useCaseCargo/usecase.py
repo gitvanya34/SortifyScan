@@ -20,8 +20,8 @@ def clean_memory_for_gpu():
 
 
 def case2():
-    export = ExportMedia()
-    export.make_video("")
+    export = ExportMedia(name_root="2024-05-03_19-09-57")
+    export.make_video(export.folder_name_collage)
 
 
 # Загрузка изображения
@@ -122,9 +122,12 @@ def case1():
 
             plt.close()
 
+    export.make_video(
+        export.folder_name_collage)
+
 
 if __name__ == "__main__":
-    case1()
+    case2()
 
 # Длина (0.569м): 0.5537314142752592м; delta 1.5268585724740769см
 # Ширина (0.516м): 0.5097783508300782м; delta 0.622164916992185см
