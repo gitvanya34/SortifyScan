@@ -92,7 +92,7 @@ def case1():
             CargoAnalysis.draw_edges(line_strings_all,
                                      cv2.cvtColor(result_det.orig_img, cv2.COLOR_BGR2RGB),
                                      n_shot,
-                                     export.folder_name_skeleton)
+                                     path = export.folder_name_skeleton)
 
             # Формируем словарь граней c координатами
             sides_dict = {"sides": []}

@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 from scipy.optimize import minimize
-from shapely import Polygon, MultiPoint
+from shapely import Polygon, MultiPoint, Point
 
 import cargo.constants as c
 from shapely.geometry import LinearRing, LineString
@@ -117,21 +117,21 @@ class CargoAnalysis:
                 x_line += line.xy[0]
                 y_line += line.xy[1]
             y_line[:] = [-i for i in y_line]
-            plt.plot(x_line, y_line, 'o-')
+            plt.plot(x_line, y_line, 'o-', linewidth=1)
 
         plt.figure()
         plt.axes()
         # plt.xlim([0, size[0]])
         # plt.ylim([-size[1], 10])#-640, 0  , 10потому что не видно врезнюю границу
 
-        for line_strings in line_strings_all:
+        for line_strings in line_strings_all[:-1]:
             draw_line_strings(line_strings)
 
         # границы ленты
-        plt.plot(c.ARR_LENT_LEFT[:, 0], c.ARR_LENT_LEFT[:, 1])
-        plt.plot(c.ARR_LENT_RIGHT[:, 0], c.ARR_LENT_RIGHT[:, 1])
-        plt.plot(c.ARR_LENT_DOWN[:, 0], c.ARR_LENT_DOWN[:, 1])
-        plt.plot(c.ARR_LENT_UP[:, 0], c.ARR_LENT_UP[:, 1])
+        plt.plot(c.ARR_LENT_LEFT[:, 0], c.ARR_LENT_LEFT[:, 1], color="red")
+        plt.plot(c.ARR_LENT_RIGHT[:, 0], c.ARR_LENT_RIGHT[:, 1], color="red")
+        plt.plot(c.ARR_LENT_DOWN[:, 0], c.ARR_LENT_DOWN[:, 1], color="red")
+        plt.plot(c.ARR_LENT_UP[:, 0], c.ARR_LENT_UP[:, 1], color="red")
         # Открываем изображение с помощью Pillow
         # image = Image.open(c.PATH_BEGIN_IMAGE)
         # Наложение графика на изображение
@@ -153,39 +153,36 @@ class CargoAnalysis:
 
         def xy_to_line_strings(xy):
             line_strings = []
+            print(xy)
             for i in range(len(xy) - 1):
                 line_strings.append(LineString([xy[i], xy[i + 1]]))
             return line_strings
 
-
         # Упрощение линии с помощью метода Рамера-Дугласа-Пекера
+        ring = LinearRing(points)
 
-        ring = LinearRing(points).convex_hull.simplify(epsilon)
-        print(ring)
-        rot_rect = LinearRing(points).simplify(epsilon).minimum_rotated_rectangle
         # Вершины упрощенного многоугольника -1 так как последняя координата повторяется
+        xy = np.c_[np.array(ring.convex_hull.simplify(epsilon).minimum_rotated_rectangle.exterior.coords)]
+        xy_rect = np.c_[np.array(ring.convex_hull.simplify(epsilon).exterior.coords)]
+        xy_rect2 = np.c_[np.array(ring.simplify(epsilon).minimum_rotated_rectangle.exterior.coords)]
 
-        xy = np.c_[np.array(ring.exterior.coords)]
-        xy_rect = np.c_[np.array(rot_rect.exterior.coords)]
+        # CargoAnalysis.minimize(xy, xy_rect)
 
-        line_strings = xy_to_line_strings(xy)
-
-        # xy_rect2 = np.c_[np.array(polygon_min_4(line_strings).exterior.coords)]
-        CargoAnalysis.minimize(xy, xy_rect)
-        if c.DEBUG:
+        def draw_xy(xy, color):
             x = [point[0] for point in xy]
             y = [point[1] for point in xy]
-            plt.plot(x, y)
+            plt.plot(x, y, color=color, marker="o")
 
-            x = [point[0] for point in xy_rect]
-            y = [point[1] for point in xy_rect]
-            plt.plot(x, y)
+        if c.DEBUG:
+            draw_xy(xy, "red")
+            draw_xy(xy_rect, "blue")
+            draw_xy(xy_rect2, "green")
+            # plt.show()
 
-            plt.show()
-
+        line_strings = xy_to_line_strings(xy_rect)
         line_strings = CargoAnalysis.drop_small_line(line_strings)
-        line_strings = CargoAnalysis.prolongation_segments(line_strings)
-        line_strings = CargoAnalysis.cut_at_intersection(line_strings)
+        # line_strings = CargoAnalysis.prolongation_segments(line_strings)
+        # line_strings = CargoAnalysis.cut_at_intersection(line_strings)
 
         return line_strings
 
@@ -213,6 +210,7 @@ class CargoAnalysis:
         #
         # print("Аппроксимированный четырехугольник:", approximated_polygon)
         return
+
     @staticmethod
     def drop_small_line(lines):
         """ Возвращает набор 4-рех ребер LineString (сведение до четырехугольника)"""
@@ -223,35 +221,55 @@ class CargoAnalysis:
 
         num_edges_to_keep = 4
 
-        def drop_coords(line1, line2):
-            start1, end1 = line1.coords[0], line1.coords[-1]
-            start2, end2 = line2.coords[0], line2.coords[-1]
+        def drop_line(left, midl, right):
+            midl_p1, midl_p2 = midl[1].coords[0], midl[1].coords[-1]
+            left_p1, left_p2 = left[1].coords[0], left[1].coords[-1]
+            right_p1, right_p2 = right[1].coords[0], right[1].coords[-1]
 
-            if end1 == start2:
-                return LineString([start1, end2])
-            elif start1 == end2:
-                return LineString([end1, start2])
-            elif start1 == start2:
-                return LineString([end1, end2])
-            elif end1 == end2:
-                return LineString([start1, start2])
-            else:
-                print("говно")
+            long_left, long_right = CargoAnalysis.prolongation_segments([left[1], right[1]])
+            new_public = long_right.intersection(long_left)
+
+            if new_public.is_empty:
+                print("\nЛинии не пересекаются.\n")
+                midl[0] = 999.0  # коэффициент неприкосновенности)
+                return left, midl, right
+
+            print(left[1], midl[1], right[1])
+            print(left[1].intersection(midl[1]))
+
+            print(left[1].intersection(midl[1]).coords[0] == left_p1,
+                  left[1].intersection(midl[1]).coords[0] == left_p2)
+            print(right[1].intersection(right[1]).coords[0] == right_p1,
+                  right[1].intersection(midl[1]).coords[0] == right_p2)
+
+            print(right[1].intersection(midl[1]))
+            left_notpublic = left_p1 if left[1].intersection(midl[1]).coords[0] != left_p1 else left_p2
+            right_notpublic = right_p1 if right[1].intersection(midl[1]).coords[0] != right_p1 else right_p2
+
+            new_public = new_public.coords[0]
+
+            # print(new_public.coords.xy.tolist())
+            new_left = LineString([left_notpublic, new_public])
+            new_right = LineString([new_public, right_notpublic])
+
+            new_left = [new_left.length, new_left]
+            new_right = [new_right.length, new_right]
+            # print(left, midl, right)
+            # print(new_left, new_right)
+            print("Итог", new_left, new_right)
+            return new_left, 0, new_right
 
         while len(xy_line_lenght) > num_edges_to_keep:
-            index_min_string = min(range(len(xy_line_lenght)), key=lambda i: xy_line_lenght[i][0])
-            if index_min_string == len(xy_line_lenght) - 1:
-                index_min_string = -1
-            if xy_line_lenght[index_min_string - 1][0] < xy_line_lenght[index_min_string + 1][0]:
-                xy_line_lenght[index_min_string - 1][1] = drop_coords(xy_line_lenght[index_min_string - 1][1],
-                                                                      xy_line_lenght[index_min_string][1])
-                xy_line_lenght[index_min_string - 1][0] = xy_line_lenght[index_min_string - 1][1].length
-            else:
-                xy_line_lenght[index_min_string + 1][1] = drop_coords(xy_line_lenght[index_min_string + 1][1],
-                                                                      xy_line_lenght[index_min_string][1])
-                xy_line_lenght[index_min_string + 1][0] = xy_line_lenght[index_min_string + 1][1].length
+            i_midl = min(range(len(xy_line_lenght)), key=lambda i: xy_line_lenght[i][0])
 
-            xy_line_lenght.pop(index_min_string)
+            i_left = i_midl - 1
+            i_right = (i_midl + 1) if i_midl != len(xy_line_lenght) - 1 else 0
+
+            xy_line_lenght[i_left], xy_line_lenght[i_midl], xy_line_lenght[i_right] = drop_line(xy_line_lenght[i_left],
+                                                                                                xy_line_lenght[i_midl],
+                                                                                                xy_line_lenght[i_right])
+            if xy_line_lenght[i_midl] == 0:
+                xy_line_lenght.pop(i_midl)
 
         xy_line_lenght = np.array(xy_line_lenght)
         xy_line_lenght = xy_line_lenght[:, 1]
@@ -259,7 +277,7 @@ class CargoAnalysis:
         if c.DEBUG:
             for line in xy_line_lenght:
                 x, y = line.xy
-                plt.plot(x, y)
+                plt.plot(x, y, color="orange", marker="o")
             # Показываем график
             plt.show()
         return xy_line_lenght
@@ -278,9 +296,12 @@ class CargoAnalysis:
             extended_p1 = [p1[0] - dx * k, p1[1] - dy * k]
             extended_p2 = [p2[0] + dx * k, p2[1] + dy * k]
 
+            if c.DEBUG:
+                plt.plot([extended_p1[0], extended_p2[0]], [extended_p1[1], extended_p2[1]])
+                plt.show()
+
             line_strings[i] = LineString([extended_p1, extended_p2])
             # x_line, y_line = line_strings[i].xy
-
         return line_strings
 
     @staticmethod
