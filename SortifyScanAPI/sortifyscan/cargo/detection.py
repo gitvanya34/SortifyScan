@@ -1,17 +1,14 @@
 import os
-from copy import copy
 
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-from ultralytics import YOLO, SAM
+from ultralytics import YOLO
 from ultralytics.models.sam import Predictor as SAMPredictor
 
-from export import ExportMedia
+from sortifyscan.export import ExportMedia
 from . import constants
 from .processing import CargoProcessing
-from ultralytics import FastSAM
-from ultralytics.models.fastsam import FastSAMPredictor, FastSAMPrompt
 
 
 class CargoDetection:
@@ -184,3 +181,11 @@ class CargoDetection:
                                            path_dir_points)
 
         return result
+
+    @staticmethod
+    def check_obj_in_area(bbox):
+        return max(constants.ARR_LENT_UP[:, 1]) < bbox[1] < min(constants.ARR_LENT_DOWN[:, 1]) and max(
+            constants.ARR_LENT_UP[:, 1]) < bbox[3] < min(
+            constants.ARR_LENT_DOWN[:, 1])
+
+

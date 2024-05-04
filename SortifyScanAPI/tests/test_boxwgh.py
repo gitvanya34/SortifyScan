@@ -2,10 +2,9 @@ import json
 
 import cv2
 
-import cargo
-import useCaseCargo
+from sortifyscan import cargo
 from privateconstants import PATH_PRIVATE_IMAGE
-from useCaseCargo import boxwgh
+from sortifyscan.cargo import boxwgh
 
 
 def test_search_upper_centroid_edges():

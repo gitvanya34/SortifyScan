@@ -11,20 +11,23 @@ from datetime import datetime
 class ExportMedia:
 
     def __init__(self, name_root=None):
-        if name_root is None:
-            self.folder_name_root = self.make_dirs()
-        else:
-            self.folder_name_root = name_root
+        self.path_output = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "Output")
 
-        self.folder_name_detection_bbox = os.path.join(self.folder_name_root, "detection_bbox")
-        self.folder_name_orig = os.path.join(self.folder_name_root, "orig")
-        self.folder_name_sam = os.path.join(self.folder_name_root, "sam")
-        self.folder_name_segmentation = os.path.join(self.folder_name_root, "segmentation")
-        self.folder_name_points = os.path.join(self.folder_name_root, "points")
-        self.folder_name_skeleton = os.path.join(self.folder_name_root, "skeleton")
-        self.folder_name_orto = os.path.join(self.folder_name_root, "orto")
-        self.folder_name_result = os.path.join(self.folder_name_root, "result")
-        self.folder_name_collage = os.path.join(self.folder_name_root, "collage")
+        if name_root is None:
+            self.path_folder_root, self.name_root = self.make_dirs()
+        else:
+            self.name_root = name_root
+            self.path_folder_root = os.path.join(self.path_output, name_root)
+
+        self.folder_name_detection_bbox = os.path.join(self.path_folder_root, "detection_bbox")
+        self.folder_name_orig = os.path.join(self.path_folder_root, "orig")
+        self.folder_name_sam = os.path.join(self.path_folder_root, "sam")
+        self.folder_name_segmentation = os.path.join(self.path_folder_root, "segmentation")
+        self.folder_name_points = os.path.join(self.path_folder_root, "points")
+        self.folder_name_skeleton = os.path.join(self.path_folder_root, "skeleton")
+        self.folder_name_orto = os.path.join(self.path_folder_root, "orto")
+        self.folder_name_result = os.path.join(self.path_folder_root, "result")
+        self.folder_name_collage = os.path.join(self.path_folder_root, "collage")
 
         if name_root is None:
             os.makedirs(self.folder_name_orig)
@@ -51,9 +54,10 @@ class ExportMedia:
         current_time = datetime.now()
         time_str = current_time.strftime("%Y-%m-%d_%H-%M-%S")
         folder_name_root = f"{time_str}"
-        os.makedirs(folder_name_root)
+
+        os.makedirs(os.path.join(self.path_output, folder_name_root))
         print(f"Создана папка с именем: {folder_name_root}")
-        return folder_name_root
+        return os.path.join(self.path_output, folder_name_root), folder_name_root
 
     def make_collage(self, n_shot):
 
@@ -99,7 +103,7 @@ class ExportMedia:
         first_image = cv2.imread(os.path.join(images_folder, image_files[0]))
         height, width, _ = first_image.shape
 
-        filename = os.path.join(self.folder_name_root, f"{self.folder_name_root}.mp4")
+        filename = os.path.join(self.path_folder_root, f"{self.path_folder_root}.mp4")
         # Инициализируем объект VideoWriter
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Выбираем кодек для сохранения видео
         out = cv2.VideoWriter(filename, fourcc, fps,

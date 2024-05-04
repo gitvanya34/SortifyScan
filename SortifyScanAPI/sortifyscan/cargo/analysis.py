@@ -1,16 +1,11 @@
-import copy
-
 import numpy as np
 import matplotlib.pyplot as plt
-from PIL import Image
-from scipy.optimize import minimize
-from shapely import Polygon, MultiPoint, Point
 
-import cargo.constants as c
+import sortifyscan.cargo.constants as c
 from shapely.geometry import LinearRing, LineString
 
-from cargo import constants
-from export import ExportMedia
+from sortifyscan.cargo import constants
+from sortifyscan.export import ExportMedia
 
 
 class CargoAnalysis:

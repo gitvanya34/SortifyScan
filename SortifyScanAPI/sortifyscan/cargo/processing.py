@@ -1,15 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
-from pathlib import Path
 import cv2
 import json
 import platform
 
 from matplotlib import patches
 
-from cargo import constants
-from export import ExportMedia
+from sortifyscan.cargo import constants
+from sortifyscan.export import ExportMedia
 
 
 class CargoProcessing:
