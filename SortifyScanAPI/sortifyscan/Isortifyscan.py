@@ -11,7 +11,7 @@ from sortifyscan import ExportMedia, JSON_BORDERS, CargoProcessing, CargoAnalysi
 from sortifyscan.cargo import boxwgh
 
 
-class StartSortifyScan:
+class ISortifyScan:
     @staticmethod
     def clean_memory_for_gpu():
         torch.cuda.empty_cache()
@@ -56,7 +56,7 @@ class StartSortifyScan:
                 CargoProcessing.show_image_detection(result_det, n_shot, export.folder_name_detection_bbox)
                 result_seg = detection.segment_cargo_bboxes_SAM(result_det.orig_img, bbox)[0]
 
-                StartSortifyScan.clean_memory_for_gpu()
+                ISortifyScan.clean_memory_for_gpu()
                 CargoProcessing.show_image_after_ultralytics(result_seg,
                                                              n_shot=n_shot,
                                                              save_dir_path=export.folder_name_sam)
