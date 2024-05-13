@@ -13,8 +13,8 @@ PATH_WEIGHTS_YOLO = "/content/SortifyScan/SortifyScanAPI/sortifyscan/weights/YOL
 PATH_WEIGHTS_SAM = "/content/SortifyScan/SortifyScanAPI/sortifyscan/weights/mobile_sam.pt"
     # os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "sortifyscan", "weights", "mobile_sam.pt"))
 #privateconstants.PATH_PRIVATE_WEIGHTS_SAM
-print(PATH_WEIGHTS_YOLO)
-print(PATH_WEIGHTS_SAM)
+# print(PATH_WEIGHTS_YOLO)
+# print(PATH_WEIGHTS_SAM)
 
 PATH_WEIGHTS_FASTSAM = "weights/FastSAM-s.pt" #privateconstants.PATH_PRIVATE_WEIGHTS_FASTSAM
 PATH_WEIGHTS_SEGYOLO9 = "weights/yolov9c-seg.pt" #privateconstants.PATH_PRIVATE_WEIGHTS_SEGYOLO9

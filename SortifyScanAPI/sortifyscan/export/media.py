@@ -56,7 +56,7 @@ class ExportMedia:
         folder_name_root = f"{time_str}"
 
         os.makedirs(os.path.join(self.path_output, folder_name_root))
-        print(f"Создана папка с именем: {folder_name_root}")
+        # print(f"Создана папка с именем: {folder_name_root}")
         return os.path.join(self.path_output, folder_name_root), folder_name_root
 
     def make_collage(self, n_shot):
@@ -118,7 +118,7 @@ class ExportMedia:
 
         # Закрываем объект VideoWriter
         out.release()
-        print(f"Сохранено видео {filename}")
+        # print(f"Сохранено видео {filename}")
 
     @staticmethod
     def export_plt(n_shot, plt, path):
@@ -127,7 +127,7 @@ class ExportMedia:
         image_path = os.path.join(path, f'{n_shot}.png')
         plt.axis('off')
         plt.savefig(image_path, dpi=300, bbox_inches='tight', pad_inches=0, transparent=True)
-        print(f"Изображение {n_shot}.png успешно сохранено в папке: {image_path}")
+        # print(f"Изображение {n_shot}.png успешно сохранено в папке: {image_path}")
 
     @staticmethod
     def export_images(n_shot, img, path):
