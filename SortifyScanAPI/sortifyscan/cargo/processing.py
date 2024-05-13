@@ -54,12 +54,12 @@ class CargoProcessing:
         ax = plt.axes()
 
         plt.imshow(result.orig_img)
-        print(result)
-        print(result.masks)
+        # print(result)
+        # print(result.masks)
         for xy in result.masks.xy:
             x1, y1 = np.array(xy)[:, 0], np.array(xy)[:, 1]
             ax.scatter(x1, y1, 1)
-            print(np.array(xy))
+            # print(np.array(xy))
         plt.show()
 
         # Предположим, что у вас есть набор точек объекта в формате xy
@@ -127,7 +127,7 @@ class CargoProcessing:
         ax.imshow(cv2.cvtColor(result_det.orig_img, cv2.COLOR_BGR2RGB))
 
         for d in data:
-            print(d)
+            # print(d)
             x1, y1 = d["box"]["x1"], d["box"]["y1"]
             x2, y2 = d["box"]["x2"], d["box"]["y2"]
             rect = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=1, edgecolor='r', facecolor='none')

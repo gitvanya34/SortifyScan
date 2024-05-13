@@ -18,7 +18,7 @@ def test_search_lowest_centroid_edges():
     box = boxwgh.Boxwgh(sides_dict)
     borders = boxwgh.Borders(cargo.JSON_BORDERS)
     borders.get_gabarity(box)
-    print(box)
+    # print(box)
 
     image = cv2.imread(PATH_PRIVATE_IMAGE)
     borders.draw_image_orto(image)

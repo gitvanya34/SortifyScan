@@ -97,8 +97,8 @@ class ExportMedia:
 
         # Получаем список файлов в папке
         image_files = sorted(os.listdir(images_folder), key=lambda x: int(x.split('.')[0]))
-        print(images_folder)
-        print(image_files)
+        # print(images_folder)
+        # print(image_files)
         # Определяем размеры видео по первому изображению
         first_image = cv2.imread(os.path.join(images_folder, image_files[0]))
         height, width, _ = first_image.shape

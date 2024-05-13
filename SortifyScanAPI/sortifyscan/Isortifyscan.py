@@ -51,7 +51,7 @@ class ISortifyScan:
                 if len(result_det.boxes.xyxy) == 0:
                     continue
                 json_result_detection = CargoProcessing.result_to_json(result_det)
-                print(json_result_detection)
+                # print(json_result_detection)
                 bbox = CargoProcessing.get_bbox_from_result(json_result_detection)
                 CargoProcessing.show_image_detection(result_det, n_shot, export.folder_name_detection_bbox)
                 result_seg = detection.segment_cargo_bboxes_SAM(result_det.orig_img, bbox)[0]

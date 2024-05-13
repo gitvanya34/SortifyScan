@@ -28,7 +28,7 @@ class CargoAnalysis:
 
         plt.xlim([0, size[0]])
         plt.ylim([-size[1], 10])  # -640, 0  , 10потому что не видно врезнюю границу
-        print(len(xy))
+        # print(len(xy))
         x1, y1, x2, y2, x3, y3 = xy
 
         # точки граней
@@ -68,9 +68,9 @@ class CargoAnalysis:
 
         point_cloud = [x1, y1, x2, y2, x3, y3]
 
-        print(len(x1), len(y1))
-        print(len(x2), len(y2))
-        print(len(x3), len(y3))
+        # print(len(x1), len(y1))
+        # print(len(x2), len(y2))
+        # print(len(x3), len(y3))
 
         return point_cloud
 
@@ -81,7 +81,7 @@ class CargoAnalysis:
         for contour in result:
             x_coords = contour[:, 0, 0]
             y_coords = -contour[:, 0, 1]
-            print(len(x_coords), len(y_coords))
+            # print(len(x_coords), len(y_coords))
             point_cloud.append([x_coords, y_coords])
 
         return point_cloud
@@ -148,7 +148,7 @@ class CargoAnalysis:
 
         def xy_to_line_strings(xy):
             line_strings = []
-            print(xy)
+            # print(xy)
             for i in range(len(xy) - 1):
                 line_strings.append(LineString([xy[i], xy[i + 1]]))
             return line_strings
@@ -229,15 +229,15 @@ class CargoAnalysis:
                 midl[0] = 999.0  # коэффициент неприкосновенности)
                 return left, midl, right
 
-            print(left[1], midl[1], right[1])
-            print(left[1].intersection(midl[1]))
-
-            print(left[1].intersection(midl[1]).coords[0] == left_p1,
-                  left[1].intersection(midl[1]).coords[0] == left_p2)
-            print(right[1].intersection(right[1]).coords[0] == right_p1,
-                  right[1].intersection(midl[1]).coords[0] == right_p2)
-
-            print(right[1].intersection(midl[1]))
+            # print(left[1], midl[1], right[1])
+            # print(left[1].intersection(midl[1]))
+            #
+            # print(left[1].intersection(midl[1]).coords[0] == left_p1,
+            #       left[1].intersection(midl[1]).coords[0] == left_p2)
+            # print(right[1].intersection(right[1]).coords[0] == right_p1,
+            #       right[1].intersection(midl[1]).coords[0] == right_p2)
+            #
+            # print(right[1].intersection(midl[1]))
             left_notpublic = left_p1 if left[1].intersection(midl[1]).coords[0] != left_p1 else left_p2
             right_notpublic = right_p1 if right[1].intersection(midl[1]).coords[0] != right_p1 else right_p2
 
@@ -251,7 +251,7 @@ class CargoAnalysis:
             new_right = [new_right.length, new_right]
             # print(left, midl, right)
             # print(new_left, new_right)
-            print("Итог", new_left, new_right)
+            # print("Итог", new_left, new_right)
             return new_left, 0, new_right
 
         while len(xy_line_lenght) > num_edges_to_keep:
