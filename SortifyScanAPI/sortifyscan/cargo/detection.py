@@ -35,8 +35,8 @@ class CargoDetection:
             image = self.path_begin_image
         model = YOLO(self.path_weights_yolo)
         result = model.predict(source=image,
-                               # device="cpu",
-                               stream=True,
+                               device='cuda',
+                               # stream=True,
                                save=True,
                                conf=conf)
         return result
@@ -54,7 +54,7 @@ class CargoDetection:
                          mode='predict',
                          imgsz=640,
                          model=self.path_weights_sam,
-                         # device='cpu',
+                         device='cuda',
                          )
         predictor = SAMPredictor(overrides=overrides, )
         predictor.set_image(image)
@@ -82,7 +82,7 @@ class CargoDetection:
                          imgsz=640,
                          model=self.path_weights_sam,
                          save_crop=True,
-                         # device='cpu'
+                         device='cuda'
                          )
         predictor = SAMPredictor(overrides=overrides)
         predictor.set_image(image)
