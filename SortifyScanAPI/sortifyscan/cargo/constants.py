@@ -5,7 +5,7 @@ import privateconstants
 DEBUG = False
 
 # PATH_BEGIN_IMAGE = privateconstants.PATH_PRIVATE_BEGIN_IMAGE
-PATH_WEIGHTS_YOLO = "weights/YOLO9best.pt"#privateconstants.PATH_PRIVATE_WEIGHTS_YOLO
+PATH_WEIGHTS_YOLO = "weights/YOLO8best.pt"#privateconstants.PATH_PRIVATE_WEIGHTS_YOLO
 PATH_WEIGHTS_SAM = "weights/mobile_sam.pt"#privateconstants.PATH_PRIVATE_WEIGHTS_SAM
 PATH_WEIGHTS_FASTSAM = "weights/FastSAM-s.pt" #privateconstants.PATH_PRIVATE_WEIGHTS_FASTSAM
 PATH_WEIGHTS_SEGYOLO9 = "weights/yolov9c-seg.pt" #privateconstants.PATH_PRIVATE_WEIGHTS_SEGYOLO9
