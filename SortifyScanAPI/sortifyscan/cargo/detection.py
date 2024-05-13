@@ -38,6 +38,7 @@ class CargoDetection:
         result = model.predict(source=image,
                                # device='cuda',
                                stream=False,
+                               stream=True,
                                save=True,
                                conf=conf)
         return result
