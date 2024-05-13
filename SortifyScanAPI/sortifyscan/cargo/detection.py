@@ -35,8 +35,8 @@ class CargoDetection:
             image = self.path_begin_image
         model = YOLO(self.path_weights_yolo)
         result = model.predict(source=image,
-                               device='cuda',
-                               # stream=True,
+                               # device='cuda',
+                               stream=False,
                                save=True,
                                conf=conf)
         return result
