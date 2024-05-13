@@ -94,6 +94,7 @@ class CargoDetection:
         return result
 
     def segment_cargo_OpenCV(self, image, n_shot, path_segment, path_points):
+        start_time_findcounturs = time.time()
         gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         sorted_contours = []
 
@@ -123,10 +124,11 @@ class CargoDetection:
             # sorted_contours = sorted(contours, key=lambda x: -len(x))
             sorted_contours = sorted(contours, key=cv2.contourArea, reverse=True)
 
-            print(
-                f"\nНайдено {len(sorted_contours)} контуров, Количество точек в контурах: {[len(contour) for contour in sorted_contours]}\n")
+            # print(
+            #     f"\nНайдено {len(sorted_contours)} контуров, Количество точек в контурах: {[len(contour) for contour in sorted_contours]}\n")
             # TODO написать критерии возврата в работу
 
+            print("\n Поиск контуров занял ", time.time() - start_time_findcounturs, " секунд\n")
             for c in sorted_contours:
                 if len(c) > 150:
                     plt.plot(c[:, 0, 0], c[:, 0, 1], linewidth=1)
@@ -173,8 +175,8 @@ class CargoDetection:
                                  path_dir_points=None,
                                  ):
         start_time_segmentation = time.time()
-
         img = CargoProcessing.preparing_for_detailed_segmentation(result_seg, result_det, crop, bgcolor)
+        print("\n подготовка к детальной сегментации заняла", time.time() - start_time_segmentation, " секунд\n")
 
         CargoProcessing.show_image(img)
 
@@ -183,8 +185,6 @@ class CargoDetection:
                                            n_shot,
                                            path_dir_segment,
                                            path_dir_points)
-        print("\n Сегментация, подготовка и поиск контуров заняла ", time.time() - start_time_segmentation, " секунд\n")
-
         return result
 
     @staticmethod
