@@ -11,6 +11,9 @@ PATH_WEIGHTS_YOLO = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pa
 #privateconstants.PATH_PRIVATE_WEIGHTS_YOLO
 PATH_WEIGHTS_SAM = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "sortifyscan", "weights", "mobile_sam.pt")
 #privateconstants.PATH_PRIVATE_WEIGHTS_SAM
+print(PATH_WEIGHTS_YOLO)
+print(PATH_WEIGHTS_SAM)
+
 PATH_WEIGHTS_FASTSAM = "weights/FastSAM-s.pt" #privateconstants.PATH_PRIVATE_WEIGHTS_FASTSAM
 PATH_WEIGHTS_SEGYOLO9 = "weights/yolov9c-seg.pt" #privateconstants.PATH_PRIVATE_WEIGHTS_SEGYOLO9
 # PATH_BEGIN_IMAGE = "/content/drive/MyDrive/images/render1.png"
