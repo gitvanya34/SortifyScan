@@ -7,11 +7,9 @@ import privateconstants
 DEBUG = False
 
 # PATH_BEGIN_IMAGE = privateconstants.PATH_PRIVATE_BEGIN_IMAGE
-PATH_WEIGHTS_YOLO = "/content/SortifyScan/SortifyScanAPI/sortifyscan/weights/YOLO8best.pt"
-    # os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "sortifyscan", "weights", "YOLO8best.pt"))
+PATH_WEIGHTS_YOLO =  os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "sortifyscan", "weights", "YOLO8best.pt")
 #privateconstants.PATH_PRIVATE_WEIGHTS_YOLO
-PATH_WEIGHTS_SAM = "/content/SortifyScan/SortifyScanAPI/sortifyscan/weights/mobile_sam.pt"
-    # os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "sortifyscan", "weights", "mobile_sam.pt"))
+PATH_WEIGHTS_SAM =  os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "sortifyscan", "weights", "mobile_sam.pt")
 #privateconstants.PATH_PRIVATE_WEIGHTS_SAM
 # print(PATH_WEIGHTS_YOLO)
 # print(PATH_WEIGHTS_SAM)
