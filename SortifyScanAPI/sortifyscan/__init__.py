@@ -11,7 +11,7 @@ from sortifyscan.export import ExportMedia
 from sortifyscan.Isortifyscan import ISortifyScan
 
 if __name__ == '__main__':
-    ISortifyScan.sortify_scan("")
+    ISortifyScan.sortify_scan("/content/SortifyScan/ConveyorEmulator/render/0000-0105 - Trim.avi")
     ISortifyScan.sortify_scan_make_video("2024-05-04_23-29-28")
 
 # Длина (0.569м): 0.5537314142752592м; delta 1.5268585724740769см
