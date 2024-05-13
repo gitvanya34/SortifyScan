@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -89,6 +91,7 @@ class CargoAnalysis:
     @staticmethod
     def approximate_point_cloud(point_cloud: list):
         # на вход [[[x],[y]],[..]]
+        start_time_approximate = time.time()
 
         # TODO сделать объединения пересекаемых полигонов после апроксимации
         x1, y1, = point_cloud[0]
@@ -101,7 +104,7 @@ class CargoAnalysis:
         line_strings_all = [CargoAnalysis.simplify_polygon(edge1, epsilon=5),
                             CargoAnalysis.simplify_polygon(edge2, epsilon=5),
                             CargoAnalysis.simplify_polygon(edge3, epsilon=5)]
-
+        print("\n Апроксимация заняла", time.time() - start_time_approximate, " секунд\n")
         return line_strings_all
 
     @staticmethod

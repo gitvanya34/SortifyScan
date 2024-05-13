@@ -1,4 +1,5 @@
 import os
+import time
 
 import cv2
 import numpy as np
@@ -54,7 +55,7 @@ class CargoDetection:
                          mode='predict',
                          imgsz=640,
                          model=self.path_weights_sam,
-                         device='cuda',
+                         # device='cuda',
                          )
         predictor = SAMPredictor(overrides=overrides, )
         predictor.set_image(image)
@@ -82,7 +83,7 @@ class CargoDetection:
                          imgsz=640,
                          model=self.path_weights_sam,
                          save_crop=True,
-                         device='cuda'
+                         # device='cuda'
                          )
         predictor = SAMPredictor(overrides=overrides)
         predictor.set_image(image)
@@ -171,6 +172,8 @@ class CargoDetection:
                                  path_dir_segment=None,
                                  path_dir_points=None,
                                  ):
+        start_time_segmentation = time.time()
+
         img = CargoProcessing.preparing_for_detailed_segmentation(result_seg, result_det, crop, bgcolor)
 
         CargoProcessing.show_image(img)
@@ -180,6 +183,7 @@ class CargoDetection:
                                            n_shot,
                                            path_dir_segment,
                                            path_dir_points)
+        print("\n Сегментация, подготовка и поиск контуров заняла ", time.time() - start_time_segmentation, " секунд\n")
 
         return result
 
