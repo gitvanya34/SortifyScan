@@ -4,7 +4,7 @@ import numpy as np
 
 import privateconstants
 
-DEBUG = True
+DEBUG = False
 
 # PATH_BEGIN_IMAGE = privateconstants.PATH_PRIVATE_BEGIN_IMAGE
 PATH_WEIGHTS_YOLO = "/content/SortifyScan/SortifyScanAPI/sortifyscan/weights/YOLO8best.pt"
