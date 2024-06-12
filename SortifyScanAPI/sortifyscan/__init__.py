@@ -11,8 +11,8 @@ from sortifyscan.export import ExportMedia
 from sortifyscan.Isortifyscan import ISortifyScan
 
 if __name__ == '__main__':
-    ISortifyScan.sortify_scan("D:\\StudentData\\Project\\Program\\sortifyscan\\ConveyorEmulator\\render\\real2-Photoroom-Photoroom.png")
-    ISortifyScan.sortify_scan_make_video("2024-05-04_23-29-28")
+    ISortifyScan.sortify_scan("")
+    # ISortifyScan.sortify_scan_make_video("2024-05-04_23-29-28")
 
 # Длина (0.569м): 0.5537314142752592м; delta 1.5268585724740769см
 # Ширина (0.516м): 0.5097783508300782м; delta 0.622164916992185см
