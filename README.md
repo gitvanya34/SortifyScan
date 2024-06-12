@@ -118,13 +118,30 @@ YOLO (You Only Look Once) - это алгоритм для обнаружени�
 
 ![image](https://github.com/gitvanya34/SortifyScan/assets/55062517/8c66350d-7244-4dc6-be4b-8a26c90c274c)
 
-## Использования цифровых двойников 
+## Синтетическая среда для генерации нужного окружения и тестовых случаев
 
 https://github.com/gitvanya34/SortifyScan/assets/55062517/75bc5bb9-46e1-4030-8f55-1e2560b3b11b
 
+https://github.com/gitvanya34/SortifyScan/assets/55062517/4b1d8331-d8bb-4405-bdbc-25aec988257d
+
+## Диаграмма классов 
+![image](https://github.com/gitvanya34/SortifyScan/assets/55062517/d1d976ac-18be-489c-a622-ce32d2d5e66d)
+
+## Диаграмма IDEF0
+![01_A-0](https://github.com/gitvanya34/SortifyScan/assets/55062517/9cc2c60e-a638-4f0e-9759-337de5bb9c2b)
+![02_A0](https://github.com/gitvanya34/SortifyScan/assets/55062517/5e34035a-3d9f-4392-be2c-dbc7b104a3c1)
+![03_A1](https://github.com/gitvanya34/SortifyScan/assets/55062517/14d07717-743a-4cc9-a478-7aa0e4d88c9a)
+![04_A2](https://github.com/gitvanya34/SortifyScan/assets/55062517/9b548a79-65f4-4616-b6de-d245c19a36c3)
+![05_A22](https://github.com/gitvanya34/SortifyScan/assets/55062517/4ae0b367-3173-492f-bf27-a6086d6b78aa)
+![06_A3](https://github.com/gitvanya34/SortifyScan/assets/55062517/a117dd22-ed97-4d22-9619-f8c2c8c7861c)
+
+## Диаграмма развертывания 
+![image](https://github.com/gitvanya34/SortifyScan/assets/55062517/bb874733-e085-4ed8-aeac-95e2f9b9a6b7)
+
 ## Планы развития
 
-В данный момент разрабатывается полноценный сервис API для взаимодействия между клиентным приложением и серверной частью 
+* разработать API для взаимодействия между клиентным приложением и серверной частью
+* Решение прочих задач складской логистики
 
 <img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/2b846e35-62cf-48b0-9686-a04f11dc0085" width="30%" alt="image">
 <img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/ea969d09-b638-49e3-b85a-ad0817ca2919" width="60%" alt="иаграмма без названия drawio">
