@@ -1,11 +1,10 @@
 # SortifyScan: Детекция и сегментация товаров на сортировочной ленте
 
-<a href="https://github.com/gitvanya34/SortifyScan/blob/main/Detection_and_Segmentation_Sortify_Scan.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Py"></a>
+<a href="https://github.com/gitvanya34/SortifyScan/blob/main/demosortifyscan.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Py"></a>
 ## Описание
 Этот репозиторий посвящен разработке системы детекции и сегментации товаров на сортировочной ленте в контексте складской логистики. Проект направлен на создание инструмента для автоматической обработки видеопотока с камер, установленных на сортировочных лентах, с целью идентификации и сегментации различных товаров.
 
 [Подробная информация об исследовании](https://github.com/gitvanya34/SortifyScan/blob/main/%D0%9F%D0%BE%D1%8F%D1%81%D0%BD%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F%20%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D0%BA%D0%B0.pdf)
-
 ## Функциональность
 - Детекция товаров на видеопотоке с камер на сортировочной ленте.
 - Сегментация обнаруженных товаров для последующей идентификации и классификации.
@@ -37,6 +36,11 @@
 </p>
 
 ## Детекция
+YOLO (You Only Look Once) - это алгоритм для обнаружения объектов на изображениях с использованием глубокого обучения и нейронных сетей.
+* Модель YOLO обучалась на размеченных датасетах в течение 10+15 эпох.
+* Обучение проводилось на разнообразных изображениях товаров.
+* Процесс обучения включал 10 эпох на одном датасете и 15 эпох на другом для улучшения точности детекции.
+* Модель обучалась на задачу обнаружения объектов 
 
 <p>
   <img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/713bb53b-e7f8-4aff-aab8-4904a3fa13e3" width="40%" alt="image">
@@ -44,6 +48,7 @@
 </p> 
 <p>
 <img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/f7e270f4-126f-4497-92ae-535e6b482127" width="30%" alt="image">
+<img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/6e1ddccf-1bb1-4def-81c2-e496722a9a60" width="50%" alt="image">
 </p> 
 
 ## Сегментация 
@@ -52,6 +57,8 @@
  <img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/ebd9fed5-f74b-4a8b-b220-6203d162f80d" width="50%" alt="image">
  <img src="https://github.com/gitvanya34/SortifyScan/assets/55062517/07207efc-aadd-4b39-8fc3-3bb9a274258a" width="30%" alt="image">
 </p> 
+
+![2024-05-13_23-01-38 - Trim (online-video-cutter com) (2)1](https://github.com/gitvanya34/SortifyScan/assets/55062517/3a2f3251-b1ca-4796-b2fb-1cc5a0cc9dc0)
 
 ## Использования цифровых двойников 
 
