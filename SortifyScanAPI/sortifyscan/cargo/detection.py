@@ -36,8 +36,7 @@ class CargoDetection:
             image = self.path_begin_image
         model = YOLO(self.path_weights_yolo)
         result = model.predict(source=image,
-                               # device='cuda',
-                               stream=False,
+                               device='cpu',
                                stream=True,
                                save=True,
                                conf=conf)
@@ -56,7 +55,7 @@ class CargoDetection:
                          mode='predict',
                          imgsz=640,
                          model=self.path_weights_sam,
-                         # device='cuda',
+                         device='cpu',
                          )
         predictor = SAMPredictor(overrides=overrides, )
         predictor.set_image(image)
@@ -84,7 +83,7 @@ class CargoDetection:
                          imgsz=640,
                          model=self.path_weights_sam,
                          save_crop=True,
-                         # device='cuda'
+                         device='cpu'
                          )
         predictor = SAMPredictor(overrides=overrides)
         predictor.set_image(image)
@@ -108,7 +107,7 @@ class CargoDetection:
         sobel_x = cv2.Sobel(gray_image, cv2.CV_64F, 1, 0, ksize=5)
         sobel_y = cv2.Sobel(gray_image, cv2.CV_64F, 0, 1, ksize=5)
         gradient_magnitude = cv2.magnitude(sobel_x, sobel_y)
-        for thresh in range(100, 101, 20):
+        for thresh in range(100, 255, 20):
 
             _, segmented_image = cv2.threshold(gradient_magnitude, thresh, 255, cv2.THRESH_BINARY)
 

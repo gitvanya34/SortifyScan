@@ -122,7 +122,7 @@ class CargoAnalysis:
         # plt.xlim([0, size[0]])
         # plt.ylim([-size[1], 10])#-640, 0  , 10потому что не видно врезнюю границу
 
-        for line_strings in line_strings_all:
+        for line_strings in line_strings_all[:]:
             draw_line_strings(line_strings)
 
         # границы ленты
