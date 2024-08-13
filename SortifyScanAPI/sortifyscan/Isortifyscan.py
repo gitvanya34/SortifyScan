@@ -110,8 +110,8 @@ class ISortifyScan:
             finally:
                 print("\nИтерация", n_shot, "заняла", time.time() - start_time, "секунд\n")
                 export.make_collage(n_shot)
-
                 plt.close()
 
-        export.make_video(
-            export.folder_name_collage)
+        export.make_video(export.folder_name_collage)
+        return box
+
