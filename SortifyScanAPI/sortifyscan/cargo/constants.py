@@ -1,22 +1,25 @@
 import os
 import numpy as np
 import privateconstants
+
 DEBUG = False
 
 # PATH_BEGIN_IMAGE = privateconstants.PATH_PRIVATE_BEGIN_IMAGE
-PATH_WEIGHTS_YOLO = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "sortifyscan", "weights", "YOLO8best.pt")
-    # "/content/SortifyScan/SortifyScanAPI/sortifyscan/weights/YOLO8best.pt"
+PATH_WEIGHTS_YOLO = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "SortifyScanAPI", "sortifyscan",
+                                 "weights", "YOLO8best.pt")
+# "/content/SortifyScan/SortifyScanAPI/sortifyscan/weights/YOLO8best.pt"
 # os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "sortifyscan", "weights", "YOLO8best.pt"))
 # privateconstants.PATH_PRIVATE_WEIGHTS_YOLO
-PATH_WEIGHTS_SAM = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "sortifyscan", "weights", "mobile_sam.pt")
+PATH_WEIGHTS_SAM = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "SortifyScanAPI", "sortifyscan",
+                                "weights", "mobile_sam.pt")
 # "/content/SortifyScan/SortifyScanAPI/sortifyscan/weights/mobile_sam.pt"
 # os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "sortifyscan", "weights", "mobile_sam.pt"))
 #privateconstants.PATH_PRIVATE_WEIGHTS_SAM
 # print(PATH_WEIGHTS_YOLO)
 # print(PATH_WEIGHTS_SAM)
 
-PATH_WEIGHTS_FASTSAM = "weights/FastSAM-s.pt" #privateconstants.PATH_PRIVATE_WEIGHTS_FASTSAM
-PATH_WEIGHTS_SEGYOLO9 = "weights/yolov9c-seg.pt" #privateconstants.PATH_PRIVATE_WEIGHTS_SEGYOLO9
+PATH_WEIGHTS_FASTSAM = "weights/FastSAM-s.pt"  #privateconstants.PATH_PRIVATE_WEIGHTS_FASTSAM
+PATH_WEIGHTS_SEGYOLO9 = "weights/yolov9c-seg.pt"  #privateconstants.PATH_PRIVATE_WEIGHTS_SEGYOLO9
 # PATH_BEGIN_IMAGE = "/content/drive/MyDrive/images/render1.png"
 # PATH_WEIGHTS_YOLO = '/content/drive/MyDrive/yolov8l.pt 2.0 /runs4 best 0.751 /detect/train4/weights/YOLO9best.pt'
 # PATH_WEIGHTS_SAM = '/content/drive/MyDrive/SAM/sam_b.pt'
@@ -40,11 +43,10 @@ ARR_LENT_UP = np.array([[166, 30], [343, 21]])
 ARR_LENT_DOWN = np.array([[187, 557], [638, 491]])
 
 JSON_BORDERS = {'left': {'line': {'xy': ARR_LENT_LEFT, 'length': LENT_REAL_LEFT}},
-                 'right': {'line': {'xy': ARR_LENT_RIGHT, 'length': LENT_REAL_RIGHT}},
-                 'up': {'line': {'xy': ARR_LENT_UP, 'length': LENT_REAL_UP}},
-                 'down': {'line': {'xy': ARR_LENT_DOWN, 'length': LENT_REAL_DOWN}},
-                 }
-
+                'right': {'line': {'xy': ARR_LENT_RIGHT, 'length': LENT_REAL_RIGHT}},
+                'up': {'line': {'xy': ARR_LENT_UP, 'length': LENT_REAL_UP}},
+                'down': {'line': {'xy': ARR_LENT_DOWN, 'length': LENT_REAL_DOWN}},
+                }
 
 MOCK_SIDES_DICT = """{'sides': [{'edges': [{'line': {'xy': [[411.40599614753864,
         59.52388654678937],
